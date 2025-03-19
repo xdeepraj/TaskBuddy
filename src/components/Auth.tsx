@@ -14,7 +14,7 @@ const Auth = () => {
             alt="Profile"
             className="w-16 h-16 rounded-full mb-2"
           />
-          <h2>Welcome, {user.displayName}</h2>
+          <h2>Welcome, {user.displayName?.toLocaleUpperCase()}</h2>
           <p className="text-gray-600">{user.email}</p>
           <button
             onClick={logout}
