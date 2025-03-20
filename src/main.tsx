@@ -5,7 +5,6 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { AuthProvider } from "./context/AuthContext";
 import Home from "./components/Home";
-import Dashboard from "./components/Dashboard";
 import theme from "./theme";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
@@ -16,7 +15,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/h" element={<Dashboard />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
