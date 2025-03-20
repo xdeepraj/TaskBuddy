@@ -1,0 +1,176 @@
+import { useAuth } from "../context/AuthContext";
+import { Button, Box, Typography, Avatar, Container } from "@mui/material";
+import GoogleIcon from "../assets/google-icon.svg";
+import ColorIcon from "../assets/color-icon.svg";
+
+const Home = () => {
+  const { user, loginWithGoogle, logout } = useAuth();
+
+  return (
+    <Container maxWidth={false} sx={{ overflow: "hidden" }} disableGutters>
+      {/* Flexbox Container */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          overflow: "hidden",
+        }}
+      >
+        {/* Left Side */}
+        <Box
+          sx={{
+            // flex: 1,
+            flex: 5,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-start",
+            justifyContent: "center",
+          }}
+        >
+          {user ? (
+            <Box>
+              <Avatar
+                src={user.photoURL || ""}
+                alt="Profile"
+                sx={{ width: 64, height: 64, mb: 2 }}
+              />
+              <Typography variant="h5">
+                Welcome, {user.displayName?.toLocaleUpperCase()}
+              </Typography>
+              <Typography variant="body1" color="textSecondary">
+                {user.email}
+              </Typography>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={logout}
+                sx={{ mt: 2 }}
+              >
+                Logout
+              </Button>
+            </Box>
+          ) : (
+            <Box sx={{ px: 10 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  mb: 1,
+                }}
+              >
+                <img
+                  src={ColorIcon}
+                  alt="Main Icon"
+                  style={{ width: 50, height: 50 }}
+                />
+                <Typography
+                  variant="body1"
+                  color="primary"
+                  fontSize="36px"
+                  fontWeight="600"
+                >
+                  TaskBuddy
+                </Typography>
+              </Box>
+
+              <Box sx={{ mb: 4, pl: 1 }}>
+                <Typography
+                  variant="body1"
+                  color="textSecondary"
+                  fontSize="12px"
+                  fontWeight="600"
+                >
+                  Streamline your workflow and track progress effortlessly
+                  <br />
+                  with our all-in-one task management app.
+                </Typography>
+              </Box>
+
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={loginWithGoogle}
+                sx={{
+                  backgroundColor: "#292929",
+                  fontFamily: "'Urbanist', sans-serif",
+                  fontSize: "22px",
+                  px: 8,
+                  py: 2,
+
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                }}
+              >
+                <img
+                  src={GoogleIcon}
+                  alt="Google Icon"
+                  style={{ width: 24, height: 24 }}
+                />
+                Continue with Google
+              </Button>
+            </Box>
+          )}
+        </Box>
+
+        {/* Right Side */}
+
+        <Box
+          sx={{
+            position: "relative",
+            width: "100vw",
+            height: "100vh",
+            overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flex: 5,
+          }}
+        >
+          {/* Outer Circle */}
+          <Box
+            sx={{
+              position: "absolute",
+              width: "50vw",
+              height: "50vw",
+              border: "1px solid",
+              borderColor: "primary.main",
+              borderRadius: "50%",
+              zIndex: 1,
+            }}
+          />
+
+          {/* Middle Circle */}
+          <Box
+            sx={{
+              position: "absolute",
+              width: "40vw",
+              height: "40vw",
+              border: "2px solid",
+              borderColor: "primary.main",
+              borderRadius: "50%",
+              zIndex: 2,
+            }}
+          />
+
+          {/* Inner Circle */}
+          <Box
+            sx={{
+              position: "absolute",
+              width: "30vw",
+              height: "30vw",
+              border: "3px solid",
+              borderColor: "primary.main",
+              borderRadius: "50%",
+              zIndex: 3,
+            }}
+          />
+        </Box>
+      </Box>
+    </Container>
+  );
+};
+
+export default Home;
