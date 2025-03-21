@@ -8,6 +8,9 @@ import Dashboard from "./Dashboard";
 const Home = () => {
   const { user, loginWithGoogle } = useAuth();
 
+  const dashboardView = new URL("../assets/dashboard-view.JPG", import.meta.url)
+    .href;
+
   return (
     <Container maxWidth={false} sx={{ overflow: "hidden" }} disableGutters>
       {user ? (
@@ -119,7 +122,6 @@ const Home = () => {
                 zIndex: 1,
               }}
             />
-
             {/* Middle Circle */}
             <Box
               sx={{
@@ -132,7 +134,6 @@ const Home = () => {
                 zIndex: 2,
               }}
             />
-
             {/* Inner Circle */}
             <Box
               sx={{
@@ -143,6 +144,18 @@ const Home = () => {
                 borderColor: "primary.main",
                 borderRadius: "50%",
                 zIndex: 3,
+              }}
+            />
+            <img
+              src={dashboardView}
+              alt="Dashboard View"
+              style={{
+                position: "absolute",
+                left: 150,
+                width: "90vw",
+                zIndex: 4,
+                boxShadow: "10px 10px 40px rgba(0, 0, 0, 0.3)",
+                borderRadius: "15px",
               }}
             />
           </Box>

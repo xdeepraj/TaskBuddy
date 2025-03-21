@@ -15,6 +15,8 @@ import {
   query,
   where,
   Timestamp,
+  doc,
+  updateDoc,
 } from "firebase/firestore";
 
 // Task structure
@@ -118,27 +120,32 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Error adding task:", error);
     }
-
-    // try {
-    //   const docRef = await addDoc(collection(db, "tasks"), {
-    //     userId: userId,
-    //     title: task.title,
-    //     description: task.description,
-    //     category: task.category,
-    //     dueDate: task.dueDate?.toISOString() || null,
-    //     status: task.status,
-    //     attachment: task.attachment ? task.attachment.name : null, // Handle file upload separately
-    //   });
-
-    //   const newTaskWithId = { ...task, id: docRef.id };
-    //   setTasks((prevTasks) => [...prevTasks, newTaskWithId]);
-    // } catch (error) {
-    //   console.error("Error adding task:", error);
-    // }
   };
 
-  const updateTask = (updatedTask: Task) => {
-    setCurrentTask(updatedTask);
+  //   const updateTask = (updatedTask: Task) => {
+  //     setCurrentTask(updatedTask);
+  //   };
+
+  const updateTask = async (updatedTask: Task) => {
+    if (!updatedTask.id) return;
+
+    try {
+      const taskRef = doc(db, "tasks", updatedTask.id);
+      await updateDoc(taskRef, {
+        ...updatedTask,
+        dueDate: updatedTask.dueDate
+          ? Timestamp.fromDate(updatedTask.dueDate.toDate())
+          : null,
+      });
+
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === updatedTask.id ? updatedTask : task
+        )
+      );
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
   };
 
   const clearTask = () => {
@@ -151,12 +158,6 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
       attachment: null,
     });
   };
-
-  //   console.log("userid from Taskcontext");
-  //   console.log(userId);
-
-  //   console.log(tasks);
-  //   console.log("-----");
 
   return (
     <TaskContext.Provider

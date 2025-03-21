@@ -14,6 +14,7 @@
     "@emotion/styled": "^11.14.0",
     "@fontsource/mulish": "^5.2.5",
     "@fontsource/urbanist": "^5.2.5",
+    "@hello-pangea/dnd": "^18.0.1",
     "@mui/icons-material": "^6.4.8",
     "@mui/lab": "^6.0.0-beta.31",
     "@mui/material": "^6.4.8",
