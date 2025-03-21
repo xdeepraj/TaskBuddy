@@ -1,4 +1,6 @@
+import { useState } from "react";
 import {
+  Button,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -6,53 +8,57 @@ import {
   Paper,
   Box,
   Divider,
+  TextField,
+  Popover,
+  IconButton,
+  List,
+  ListItemButton,
+  Stack,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import SubdirectoryArrowLeftIcon from "@mui/icons-material/SubdirectoryArrowLeft";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs, { Dayjs } from "dayjs";
 
-const tasks = [
-  {
-    name: "Task 1",
-    dueOn: "2025-03-25",
-    status: "Pending",
-    category: "Work",
-  },
-  {
-    name: "Task 2",
-    dueOn: "2025-03-26",
-    status: "Completed",
-    category: "Personal",
-  },
-  {
-    name: "Task 3",
-    dueOn: "2025-03-27",
-    status: "In Progress",
-    category: "Study",
-  },
-  {
-    name: "Task 4",
-    dueOn: "2025-03-28",
-    status: "In Progress",
-    category: "Work",
-  },
-  {
-    name: "Task 5",
-    dueOn: "2025-04-12",
-    status: "Pending",
-    category: "Study",
-  },
-];
-
-// Filter tasks based on their status
-const todoTasks = tasks.filter((task) => task.status === "Pending");
-const inProgressTasks = tasks.filter((task) => task.status === "In Progress");
-const completedTasks = tasks.filter((task) => task.status === "Completed");
+import { useTask } from "../context/TaskContext";
 
 const ListView = () => {
+  const { tasks, addTask } = useTask();
+
+  const [showAddTask, setShowAddTask] = useState<boolean>(false);
+  const [newTask, setNewTask] = useState({
+    title: "",
+    dueDate: null as Dayjs | null,
+    status: "",
+    category: "",
+  });
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [popoverType, setPopoverType] = useState<"status" | "category" | "">(
+    ""
+  );
+
+  const missingFields: string[] = [];
+  if (!newTask.title) missingFields.push("TASK TITLE");
+  if (!newTask.category) missingFields.push("TASK CATEGORY");
+  if (!newTask.dueDate) missingFields.push("DUE DATE");
+  if (!newTask.status) missingFields.push("TASK STATUS");
+
+  // Filter tasks based on their status
+  const todoTasks = tasks.filter((task) => task.status === "TODO");
+  const inProgressTasks = tasks.filter((task) => task.status === "IN PROGRESS");
+  const completedTasks = tasks.filter((task) => task.status === "COMPLETED");
+
+  // Creating three accordian
   const taskAccordions = [
     {
       title: `TODO (${todoTasks.length})`,
       taskList: todoTasks,
       bgColor: "#fac3ff",
+      showAddButton: true,
     },
     {
       title: `IN PROGRESS (${inProgressTasks.length})`,
@@ -65,6 +71,49 @@ const ListView = () => {
       bgColor: "#ceffcc",
     },
   ];
+
+  const handleAddTask = () => {
+    if (
+      !newTask.title ||
+      !newTask.dueDate ||
+      !newTask.status ||
+      !newTask.category
+    ) {
+      return; // Prevent adding if any field is missing
+    }
+
+    addTask({
+      ...newTask,
+      dueDate: newTask.dueDate,
+      description: "",
+      attachment: null,
+    });
+
+    // Reset form and hide input fields
+    setNewTask({ title: "", dueDate: null, status: "", category: "" });
+    setShowAddTask(false);
+  };
+
+  const handleClose = () => {
+    setShowAddTask(false);
+    newTask.title = "";
+    newTask.category = "";
+    newTask.status = "";
+    newTask.dueDate = null;
+  };
+
+  const handleOpenPopover = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    type: "status" | "category"
+  ) => {
+    setAnchorEl(event.currentTarget);
+    setPopoverType(type);
+  };
+
+  const handleClosePopover = () => {
+    setAnchorEl(null);
+    setPopoverType("");
+  };
 
   return (
     <Paper
@@ -81,7 +130,7 @@ const ListView = () => {
           padding: 1,
         }}
       >
-        <Typography sx={{ width: "25%" }}>Task Name</Typography>
+        <Typography sx={{ width: "50%" }}>Task Name</Typography>
         <Typography sx={{ width: "25%" }}>Due On</Typography>
         <Typography sx={{ width: "25%" }}>Task Status</Typography>
         <Typography sx={{ width: "25%" }}>Task Category</Typography>
@@ -117,27 +166,267 @@ const ListView = () => {
                 p: 0,
               }}
             >
+              {/* Show "Add Task" button if the showAddButton is true */}
+              {taskAccordion.showAddButton && (
+                <>
+                  <Button
+                    variant="text"
+                    color="primary"
+                    sx={{ pl: 3, py: 2 }}
+                    startIcon={<AddIcon />}
+                    onClick={() => setShowAddTask(true)}
+                  >
+                    ADD TASK
+                  </Button>
+                  <Divider
+                    sx={{ borderColor: "#d9d9d9", width: "100%", my: 2 }}
+                  />
+                </>
+              )}
+
+              {/* Show input fields when "Add Task" is clicked */}
+              {taskAccordion.showAddButton && showAddTask && (
+                <>
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: "2fr 1fr 1fr 1fr",
+                      gap: 2,
+                      padding: 1,
+                      alignItems: "center",
+                    }}
+                  >
+                    {/* Task Title */}
+                    <TextField
+                      label="Task Title"
+                      value={newTask.title}
+                      onChange={(e) =>
+                        setNewTask((prev) => ({
+                          ...prev,
+                          title: e.target.value,
+                        }))
+                      }
+                      variant="standard"
+                    />
+
+                    {/* Due Date */}
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        disablePast
+                        value={newTask.dueDate}
+                        onChange={(date) =>
+                          setNewTask((prev) => ({ ...prev, dueDate: date }))
+                        }
+                        slots={{
+                          textField: (params) => (
+                            <TextField
+                              {...params}
+                              size="small"
+                              sx={{ backgroundColor: "#f1f1f1", width: "90%" }}
+                            />
+                          ),
+                        }}
+                      />
+                    </LocalizationProvider>
+
+                    {/* Status Popover */}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        alignItems: "center",
+                      }}
+                    >
+                      <IconButton
+                        onClick={(e) => handleOpenPopover(e, "status")}
+                      >
+                        <AddIcon />
+                      </IconButton>
+                      {newTask.status && (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            backgroundColor: "#dddadd",
+                            px: 1,
+                            py: 0.5,
+                            borderRadius: "4px",
+                          }}
+                        >
+                          {newTask.status}
+                        </Typography>
+                      )}
+                    </Box>
+
+                    {/* Category Popover */}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        alignItems: "center",
+                      }}
+                    >
+                      <IconButton
+                        onClick={(e) => handleOpenPopover(e, "category")}
+                      >
+                        <AddIcon />
+                      </IconButton>
+                      {newTask.category && (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            backgroundColor: "#dddadd",
+                            px: 1,
+                            py: 0.5,
+                            borderRadius: "4px",
+                            fontSize: "15px",
+                          }}
+                        >
+                          {newTask.category}
+                        </Typography>
+                      )}
+                    </Box>
+
+                    <Popover
+                      open={Boolean(anchorEl)}
+                      anchorEl={anchorEl}
+                      onClose={handleClosePopover}
+                      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                    >
+                      <List>
+                        {popoverType === "status"
+                          ? ["TODO", "IN PROGRESS", "COMPLETED"].map(
+                              (option) => (
+                                <ListItemButton
+                                  key={option}
+                                  onClick={() => {
+                                    setNewTask((prev) => ({
+                                      ...prev,
+                                      status: option,
+                                    }));
+                                    handleClosePopover();
+                                  }}
+                                >
+                                  {option}
+                                </ListItemButton>
+                              )
+                            )
+                          : ["Work", "Personal"].map((option) => (
+                              <ListItemButton
+                                key={option}
+                                onClick={() => {
+                                  setNewTask((prev) => ({
+                                    ...prev,
+                                    category: option,
+                                  }));
+                                  handleClosePopover();
+                                }}
+                              >
+                                {option}
+                              </ListItemButton>
+                            ))}
+                      </List>
+                    </Popover>
+                  </Box>
+
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="center"
+                    sx={{ mt: 2, mb: 0.5 }}
+                  >
+                    {missingFields.length > 0 && (
+                      <Typography
+                        variant="caption"
+                        color="error"
+                        sx={{ alignSelf: "flex-end" }}
+                      >
+                        **PLEASE PROVIDE: {missingFields.join(", ")}.
+                      </Typography>
+                    )}
+                  </Stack>
+
+                  {/* Add & Cancel Buttons */}
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    justifyContent="center"
+                    sx={{ mb: 2 }}
+                  >
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleAddTask}
+                      endIcon={<SubdirectoryArrowLeftIcon />}
+                      disabled={
+                        !newTask.title ||
+                        !newTask.dueDate ||
+                        !newTask.status ||
+                        !newTask.category
+                      }
+                    >
+                      ADD
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      onClick={handleClose}
+                    >
+                      CANCEL
+                    </Button>
+                  </Stack>
+
+                  <Divider
+                    sx={{ borderColor: "#d9d9d9", width: "100%", my: 2 }}
+                  />
+                </>
+              )}
+
               {taskAccordion.taskList.length > 0 ? (
                 taskAccordion.taskList.map((task, idx) => (
                   <Box key={idx}>
                     <Box
                       sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
+                        display: "grid",
+                        gridTemplateColumns: "2fr 1fr 1fr 1fr",
+                        gap: 2,
                         padding: 1,
+                        alignItems: "center",
                       }}
                     >
-                      <Typography sx={{ width: "25%" }}>{task.name}</Typography>
-                      <Typography sx={{ width: "25%" }}>
-                        {task.dueOn}
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {task.title}
                       </Typography>
-                      <Typography sx={{ width: "25%" }}>
-                        {task.status}
+                      <Typography variant="body1">
+                        {task.dueDate
+                          ? dayjs(task.dueDate.toDate()).format("DD MMM, YYYY")
+                          : "No due date"}
                       </Typography>
-                      <Typography sx={{ width: "25%" }}>
-                        {task.category}
-                      </Typography>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Typography
+                          variant="body1"
+                          sx={{
+                            backgroundColor: "#dddadd",
+                            px: 1,
+                            py: 0.5,
+                            borderRadius: "4px",
+                            fontSize: "15px",
+                            display: "inline-block",
+                            width: "fit-content",
+                          }}
+                        >
+                          {task.status}
+                        </Typography>
+                      </Box>
+                      <Typography variant="body1">{task.category}</Typography>
                     </Box>
+
                     {idx !== taskAccordion.taskList.length - 1 && (
                       <Divider sx={{ borderColor: "#d9d9d9", width: "100%" }} />
                     )}

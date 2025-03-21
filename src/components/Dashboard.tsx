@@ -1,4 +1,4 @@
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, ChangeEvent } from "react";
 
 import {
   Button,
@@ -24,22 +24,35 @@ import LogoutIcon from "../assets/logout-icon.svg";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Dayjs } from "dayjs";
 
 import ListView from "./ListView";
 import BoardView from "./BoardView";
+
+import TaskForm from "./TaskForm";
+
+import { useTask } from "../context/TaskContext";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const username = user?.displayName?.split(" ")[0];
 
   const [view, setView] = useState<"list" | "board">("list");
-  const [category, setCategory] = useState<string>("all");
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
-  const [query, setQuery] = useState<string>("");
+  const [open, setOpen] = useState<boolean>(false);
+
+  const {
+    filterCategory,
+    setFilterCategory,
+    filterDate,
+    setFilterDate,
+    searchQuery,
+    setSearchQuery,
+  } = useTask();
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const handleCategoryChange = (event: SelectChangeEvent<string>) => {
-    setCategory(event.target.value);
+    setFilterCategory(event.target.value);
   };
 
   const handleView = (): void => {
@@ -51,15 +64,8 @@ const Dashboard = () => {
   };
 
   const handleSearch = (event: ChangeEvent<HTMLInputElement>): void => {
-    setQuery(event.target.value as string);
+    setSearchQuery(event.target.value as string);
   };
-
-  useEffect(() => {
-    console.log("category: ", category);
-  }, [category]);
-  useEffect(() => {
-    console.log("selectedDate: ", selectedDate);
-  }, [selectedDate]);
 
   return (
     <Box
@@ -196,7 +202,7 @@ const Dashboard = () => {
           <FormControl size="small">
             <InputLabel>Category</InputLabel>
             <Select
-              value={category}
+              value={filterCategory}
               label="Category"
               onChange={handleCategoryChange}
               sx={{ minWidth: 120, borderRadius: 5 }}
@@ -211,14 +217,14 @@ const Dashboard = () => {
             <DatePicker
               disablePast
               label="Due Date"
-              value={selectedDate}
-              onChange={(newValue) => setSelectedDate(newValue)}
+              value={filterDate}
+              onChange={(newValue) => setFilterDate(newValue)}
               slotProps={{
                 textField: {
                   size: "small",
                   sx: { height: 40, minWidth: 150 },
-                  helperText: selectedDate
-                    ? `Showing for ${selectedDate.format(
+                  helperText: filterDate
+                    ? `Showing for ${filterDate.format(
                         "Do MMMM, YYYY"
                       )} & previous dates`
                     : "Showing for all dates",
@@ -227,9 +233,9 @@ const Dashboard = () => {
             />
           </LocalizationProvider>
           {/* Clear Filter Button */}
-          {selectedDate && (
+          {filterDate && (
             <Button
-              onClick={() => setSelectedDate(null)}
+              onClick={() => setFilterDate(null)}
               variant="outlined"
               size="small"
             >
@@ -244,13 +250,14 @@ const Dashboard = () => {
             label="Search"
             variant="outlined"
             fullWidth
-            value={query}
+            value={searchQuery}
             onChange={handleSearch}
           />
 
           <Button
             variant="contained"
             sx={{ minWidth: "150px", height: "60px" }}
+            onClick={handleOpen}
           >
             <Typography variant="body1" fontSize="18px">
               ADD TASK
@@ -260,8 +267,12 @@ const Dashboard = () => {
       </Stack>
 
       <Divider sx={{ borderColor: "#e8e8e8", mt: 6 }} />
+
       {/* Render List View or Board View */}
       <Box>{view === "list" ? <ListView /> : <BoardView />}</Box>
+
+      {/* Dialog to create task */}
+      {open && <TaskForm open={open} handleClose={handleClose} />}
     </Box>
   );
 };
