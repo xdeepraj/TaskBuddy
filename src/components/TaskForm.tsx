@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 
 import {
@@ -17,6 +17,7 @@ import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import CloseIcon from "@mui/icons-material/Close";
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -26,13 +27,14 @@ import { Bold, Italic, List, ListOrdered, Strikethrough } from "lucide-react";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 
 import "../App.css";
 
 import { useTask } from "../context/TaskContext";
 
 interface Task {
+  id?: string;
   title: string;
   description: string;
   category: string;
@@ -41,13 +43,7 @@ interface Task {
   attachment: File | null;
 }
 
-interface TaskFormProps {
-  open: boolean;
-  handleClose: () => void;
-}
-
-// const TaskForm = () => {
-const TaskForm: React.FC<TaskFormProps> = ({ open, handleClose }) => {
+const TaskForm: React.FC = () => {
   const [createTitle, setCreateTitle] = useState<string>("");
   const [createDescription, setCreateDescription] = useState<string>("");
   const [createCategory, setCreateCategory] = useState<string>("");
@@ -55,7 +51,38 @@ const TaskForm: React.FC<TaskFormProps> = ({ open, handleClose }) => {
   const [createStatus, setCreateStatus] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const { addTask } = useTask();
+  const { openForm, setOpenForm, currentTask, addTask, updateTask } = useTask();
+
+  const handleClose = () => {
+    setOpenForm(false);
+  };
+
+  // Populate fields for editing
+  useEffect(() => {
+    if (currentTask) {
+      setCreateTitle(currentTask.title);
+      setCreateDescription(currentTask.description);
+      setCreateCategory(currentTask.category);
+
+      // Check if the dueDate is already a valid Dayjs instance
+      const dueDate: Dayjs | null = dayjs.isDayjs(currentTask.dueDate)
+        ? currentTask.dueDate
+        : currentTask.dueDate
+        ? dayjs(currentTask.dueDate.seconds * 1000)
+        : null;
+
+      setCreateDate(dueDate);
+      setCreateStatus(currentTask.status);
+      setSelectedFile(currentTask.attachment || null);
+    } else {
+      setCreateTitle("");
+      setCreateDescription("");
+      setCreateCategory("");
+      setCreateDate(null);
+      setCreateStatus("");
+      setSelectedFile(null);
+    }
+  }, [currentTask]);
 
   // Compute missing fields
   const missingFields = [];
@@ -90,6 +117,13 @@ const TaskForm: React.FC<TaskFormProps> = ({ open, handleClose }) => {
     },
   });
 
+  // Update editor content when currentTask changes
+  useEffect(() => {
+    if (editor && currentTask) {
+      editor.commands.setContent(currentTask.description || ""); // Set editor content if currentTask is present
+    }
+  }, [editor, currentTask]);
+
   const onDrop = (acceptedFiles: File[]) => {
     setSelectedFile(acceptedFiles[0]);
   };
@@ -110,27 +144,32 @@ const TaskForm: React.FC<TaskFormProps> = ({ open, handleClose }) => {
       attachment: selectedFile,
     };
 
-    addTask(newTask); // Store task in context
-    handleClose(); // Close the modal after adding task
+    if (currentTask) updateTask({ ...currentTask, ...newTask });
+    else addTask(newTask);
 
-    // Reset fields after adding task
-    setCreateTitle("");
-    setCreateDescription("");
-    setCreateCategory("");
-    setCreateDate(null);
-    setCreateStatus("");
-    setSelectedFile(null);
+    handleClose(); // Close the modal after adding task
   };
 
   return (
     <Dialog
-      open={open}
+      open={openForm}
       onClose={handleClose}
       fullWidth
       maxWidth="md"
       sx={{ "& .MuiDialog-paper": { borderRadius: 3 } }}
     >
-      <DialogTitle>Create Task</DialogTitle>
+      <DialogTitle
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        {currentTask ? "Update Task" : "Create Task"}{" "}
+        <IconButton onClick={handleClose} size="small">
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
 
       <Divider />
       <DialogContent>
@@ -336,6 +375,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ open, handleClose }) => {
           </Stack>
         </Stack>
       </DialogContent>
+
       <DialogActions
         sx={{ flexDirection: "column", alignItems: "stretch", gap: 1 }}
       >
@@ -360,7 +400,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ open, handleClose }) => {
             onClick={handleCreateTask}
             disabled={isCreateDisabled}
           >
-            CREATE
+            {currentTask ? "UPDATE" : "CREATE"}
           </Button>
         </Stack>
       </DialogActions>

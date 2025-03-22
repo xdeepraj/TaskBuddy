@@ -14,11 +14,16 @@ import {
   List,
   ListItemButton,
   Stack,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import SubdirectoryArrowLeftIcon from "@mui/icons-material/SubdirectoryArrowLeft";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import BorderColorIcon from "@mui/icons-material/BorderColor";
+
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -28,6 +33,9 @@ import { useTask } from "../context/TaskContext";
 
 import checkmark from "../assets/checkmark.svg";
 import uncheckmark from "../assets/uncheckmark.svg";
+import deleteicon from "../assets/delete-icon.svg";
+
+import TaskForm from "./TaskForm";
 
 import {
   DragDropContext,
@@ -47,7 +55,24 @@ interface Task {
 }
 
 const ListView = () => {
-  const { tasks, addTask, updateTask } = useTask();
+  const {
+    tasks,
+    filteredTasks,
+    filterCategory,
+    filterDate,
+    searchQuery,
+    addTask,
+    updateTask,
+    deleteTask,
+    setCurrentTask,
+    setOpenForm,
+  } = useTask();
+
+  // Determine which array to display based on filters
+  const displayTasks =
+    filterCategory === "All" && !filterDate && !searchQuery
+      ? tasks
+      : filteredTasks;
 
   const [showAddTask, setShowAddTask] = useState<boolean>(false);
   const [newTask, setNewTask] = useState({
@@ -62,16 +87,23 @@ const ListView = () => {
     ""
   );
 
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
   const missingFields: string[] = [];
   if (!newTask.title) missingFields.push("TASK TITLE");
   if (!newTask.category) missingFields.push("TASK CATEGORY");
   if (!newTask.dueDate) missingFields.push("DUE DATE");
   if (!newTask.status) missingFields.push("TASK STATUS");
 
-  // Filter tasks based on their status
-  const todoTasks = tasks.filter((task) => task.status === "TODO");
-  const inProgressTasks = tasks.filter((task) => task.status === "IN PROGRESS");
-  const completedTasks = tasks.filter((task) => task.status === "COMPLETED");
+  // Filter displayTasks based on their status
+  const todoTasks = displayTasks.filter((task) => task.status === "TODO");
+  const inProgressTasks = displayTasks.filter(
+    (task) => task.status === "IN PROGRESS"
+  );
+  const completedTasks = displayTasks.filter(
+    (task) => task.status === "COMPLETED"
+  );
 
   // Creating three accordian
   const taskAccordions = [
@@ -115,7 +147,7 @@ const ListView = () => {
     setShowAddTask(false);
   };
 
-  const handleClose = () => {
+  const handleCancel = () => {
     setShowAddTask(false);
     newTask.title = "";
     newTask.category = "";
@@ -142,7 +174,7 @@ const ListView = () => {
     const { source, destination, draggableId } = result;
 
     if (source.droppableId !== destination.droppableId) {
-      const movedTask = tasks.find((task) => task.id === draggableId);
+      const movedTask = displayTasks.find((task) => task.id === draggableId);
 
       if (movedTask) {
         updateTask({
@@ -151,6 +183,24 @@ const ListView = () => {
         });
       }
     }
+  };
+
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    task: Task
+  ) => {
+    setMenuAnchor(event.currentTarget);
+    setSelectedTask(task);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchor(null);
+    setSelectedTask(null);
+  };
+
+  const handleEdit = (selectedTask: any) => {
+    setCurrentTask(selectedTask);
+    setOpenForm(true);
   };
 
   return (
@@ -169,9 +219,10 @@ const ListView = () => {
         }}
       >
         <Typography sx={{ width: "50%" }}>Task Name</Typography>
-        <Typography sx={{ width: "25%" }}>Due On</Typography>
-        <Typography sx={{ width: "25%" }}>Task Status</Typography>
-        <Typography sx={{ width: "25%" }}>Task Category</Typography>
+        <Typography sx={{ width: "20%" }}>Due On</Typography>
+        <Typography sx={{ width: "20%" }}>Task Status</Typography>
+        <Typography sx={{ width: "20%" }}>Task Category</Typography>
+        <Typography sx={{ width: "10%" }}></Typography>
       </Box>
 
       {/* Dynamically Render Task Accordions */}
@@ -421,7 +472,7 @@ const ListView = () => {
                         <Button
                           variant="outlined"
                           color="secondary"
-                          onClick={handleClose}
+                          onClick={handleCancel}
                         >
                           CANCEL
                         </Button>
@@ -432,6 +483,66 @@ const ListView = () => {
                       />
                     </>
                   )}
+
+                  {/* Show edit & delete when three dot is clicked */}
+                  {
+                    <Menu
+                      anchorEl={menuAnchor}
+                      open={Boolean(menuAnchor)}
+                      onClose={handleMenuClose}
+                    >
+                      <MenuItem
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
+                        <Box
+                          onClick={() => {
+                            handleEdit(selectedTask);
+                            handleMenuClose();
+                          }}
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          <BorderColorIcon sx={{ fontSize: 15, mr: 2 }} />
+                          <Typography variant="body2" fontSize="18px">
+                            Edit
+                          </Typography>
+                        </Box>
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          if (selectedTask?.id) {
+                            deleteTask(selectedTask.id);
+                          }
+                          handleMenuClose();
+                        }}
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
+                        <Box
+                          component="img"
+                          src={deleteicon}
+                          alt="Delete"
+                          sx={{ width: 15, height: 15 }}
+                        />
+                        <Typography
+                          variant="body2"
+                          fontSize="18px"
+                          color="error.main"
+                        >
+                          Delete
+                        </Typography>
+                      </MenuItem>
+                    </Menu>
+                  }
 
                   {taskAccordion.taskList.length > 0 ? (
                     taskAccordion.taskList.map((task: Task, idx: number) => (
@@ -447,18 +558,16 @@ const ListView = () => {
                             {...provided.dragHandleProps}
                             sx={{
                               display: "grid",
-                              gridTemplateColumns: "2fr 1fr 1fr 1fr",
+                              gridTemplateColumns: "5fr 2fr 2fr 2fr 1fr",
                               gap: 2,
                               padding: 1,
                               alignItems: "center",
-                              backgroundColor: "white",
+                              backgroundColor: "#f1f1f1",
                               boxShadow: "2px 2px 5px rgba(0,0,0,0.1)",
                               borderRadius: "4px",
                             }}
                           >
-                            {/* <img src={DragIndicatorIcon} alt={} width={24} height={24} /> */}
-
-                            {/* Task Status Icon + Title in the same row */}
+                            {/* Drag indicator + check/uncheck + Title */}
                             <Box
                               sx={{
                                 display: "flex",
@@ -499,13 +608,18 @@ const ListView = () => {
                               </Typography>
                             </Box>
 
-                            <Typography variant="body1">
-                              {task.dueDate
-                                ? dayjs(task.dueDate.toDate()).format(
-                                    "DD MMM, YYYY"
-                                  )
-                                : "No due date"}
-                            </Typography>
+                            {/* Due Date */}
+                            <Box>
+                              <Typography variant="body1">
+                                {task.dueDate
+                                  ? dayjs(task.dueDate.toDate()).format(
+                                      "DD MMM, YYYY"
+                                    )
+                                  : "No due date"}
+                              </Typography>
+                            </Box>
+
+                            {/* Task Status */}
                             <Box sx={{ display: "flex", alignItems: "center" }}>
                               <Typography
                                 variant="body1"
@@ -522,9 +636,22 @@ const ListView = () => {
                                 {task.status}
                               </Typography>
                             </Box>
-                            <Typography variant="body1">
-                              {task.category}
-                            </Typography>
+
+                            {/* Category */}
+                            <Box>
+                              <Typography variant="body1">
+                                {task.category}
+                              </Typography>
+                            </Box>
+
+                            {/* Actions */}
+                            <Box>
+                              <IconButton
+                                onClick={(e) => handleMenuOpen(e, task)}
+                              >
+                                <MoreHorizIcon />
+                              </IconButton>
+                            </Box>
                           </Box>
                         )}
                       </Draggable>
@@ -554,6 +681,9 @@ const ListView = () => {
           </Droppable>
         ))}
       </DragDropContext>
+
+      {/* Render Task Form for Adding a New Task */}
+      <TaskForm />
     </Paper>
   );
 };

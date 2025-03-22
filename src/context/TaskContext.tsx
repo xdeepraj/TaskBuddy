@@ -5,18 +5,19 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "dayjs";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebaseConfig";
 import {
   collection,
   addDoc,
-  getDocs,
   query,
   where,
   Timestamp,
   doc,
   updateDoc,
+  deleteDoc,
+  onSnapshot,
 } from "firebase/firestore";
 
 // Task structure
@@ -33,10 +34,20 @@ interface Task {
 // shape of the context data that will be available globally
 interface TaskContextType {
   tasks: Task[]; // Store multiple tasks
-  addTask: (task: Task) => void; // Function to add new task
-  currentTask: Task;
+  filteredTasks: Task[];
+  currentTask: Task | null;
+
+  setCurrentTask: (task: Task | null) => void;
+
+  // Function to add, update, delete tasks
+  addTask: (task: Task) => void;
   updateTask: (updatedTask: Task) => void;
+  deleteTask: (taskId: string) => void;
   clearTask: () => void;
+
+  // form
+  openForm: boolean;
+  setOpenForm: (open: boolean) => void;
 
   // Filters
   filterCategory: string;
@@ -54,49 +65,84 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
   const userId = user?.uid;
 
-  const [tasks, setTasks] = useState<Task[]>([]); // Store multiple tasks
-  const [currentTask, setCurrentTask] = useState<Task>({
-    title: "",
-    description: "",
-    category: "",
-    dueDate: null,
-    status: "",
-    attachment: null,
-  });
+  const [tasks, setTasks] = useState<Task[]>([]); // Store original tasks
+  const [filteredTasks, setFilteredTasks] = useState<Task[]>([]); // Store filtered tasks
 
-  const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [currentTask, setCurrentTask] = useState<Task | null>(null);
+  // Dialog state for TaskForm
+  const [openForm, setOpenForm] = useState(false);
+
+  // Filters
+  const [filterCategory, setFilterCategory] = useState<string>("All");
   const [filterDate, setFilterDate] = useState<Dayjs | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
 
-  // Fetch Tasks from Firestore when User Logs In
+  // Fetch Tasks from Firestore when User Logs In & using Firestore Listener
   useEffect(() => {
     if (!userId) return;
-    const fetchTasks = async () => {
-      try {
-        const tasksQuery = query(
-          collection(db, "tasks"),
-          where("userId", "==", userId)
-        );
-        const querySnapshot = await getDocs(tasksQuery);
-        const tasksData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Task[];
-        setTasks(tasksData);
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      }
-    };
 
-    fetchTasks();
+    // Fetch all tasks for the logged-in user initially
+    const tasksQuery = query(
+      collection(db, "tasks"),
+      where("userId", "==", userId)
+    );
+
+    // Real-time listener for all tasks
+    const unsubscribe = onSnapshot(tasksQuery, (querySnapshot) => {
+      const tasksData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Task[];
+
+      setTasks(tasksData); // Store all tasks
+    });
+
+    return () => unsubscribe(); // Cleanup listener
   }, [userId]);
+
+  // Custom debounce logic using setTimeout
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500); // Adjust debounce delay as needed
+
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  // Effect to apply filters locally
+  useEffect(() => {
+    let filtered = tasks;
+
+    // Apply category filter
+    if (filterCategory !== "All") {
+      filtered = filtered.filter((task) => task.category === filterCategory);
+    }
+
+    // Apply date filter for all tasks up to the selected date
+    if (filterDate) {
+      filtered = filtered.filter((task) => {
+        const taskDueDate = task.dueDate ? task.dueDate.toDate() : null;
+        return taskDueDate && taskDueDate <= filterDate.endOf("day").toDate();
+      });
+    }
+
+    // Apply search filter
+    if (debouncedSearchQuery) {
+      filtered = filtered.filter((task) =>
+        task.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+      );
+    }
+
+    setFilteredTasks(filtered);
+  }, [tasks, filterCategory, filterDate, debouncedSearchQuery]);
 
   // Add a Task to Firestore and State
   const addTask = async (task: Task) => {
     if (!userId) return;
 
-    // console.log("task in addTask");
-    // console.log(task);
+    // Close dialog after adding
+    setOpenForm(false);
 
     // Convert Dayjs `dueDate` to Firestore Timestamp before storing
     const newTask = {
@@ -109,25 +155,17 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       await addDoc(collection(db, "tasks"), newTask);
-      // Convert Firestore Timestamp back to Dayjs when updating local state
-      setTasks((prevTasks) => [
-        ...prevTasks,
-        {
-          ...task,
-          dueDate: task.dueDate ? dayjs(task.dueDate.startOf("day")) : null, // Convert Timestamp back to Dayjs
-        },
-      ]);
     } catch (error) {
       console.error("Error adding task:", error);
     }
   };
 
-  //   const updateTask = (updatedTask: Task) => {
-  //     setCurrentTask(updatedTask);
-  //   };
-
+  // Update an existing task
   const updateTask = async (updatedTask: Task) => {
     if (!updatedTask.id) return;
+
+    // Close dialog after updating
+    setOpenForm(false);
 
     try {
       const taskRef = doc(db, "tasks", updatedTask.id);
@@ -137,17 +175,23 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
           ? Timestamp.fromDate(updatedTask.dueDate.toDate())
           : null,
       });
-
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === updatedTask.id ? updatedTask : task
-        )
-      );
     } catch (error) {
       console.error("Error updating task:", error);
     }
   };
 
+  // Delete a task
+  const deleteTask = async (taskId: string) => {
+    if (!taskId) return;
+
+    try {
+      await deleteDoc(doc(db, "tasks", taskId));
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
+  };
+
+  // Clear current task data
   const clearTask = () => {
     setCurrentTask({
       title: "",
@@ -163,9 +207,14 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     <TaskContext.Provider
       value={{
         tasks,
-        addTask,
+        filteredTasks,
         currentTask,
+        setCurrentTask,
+        openForm,
+        setOpenForm,
+        addTask,
         updateTask,
+        deleteTask,
         clearTask,
         filterCategory,
         setFilterCategory,

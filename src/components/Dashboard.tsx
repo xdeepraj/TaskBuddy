@@ -37,9 +37,11 @@ const Dashboard = () => {
   const username = user?.displayName?.split(" ")[0];
 
   const [view, setView] = useState<"list" | "board">("list");
-  const [open, setOpen] = useState<boolean>(false);
 
   const {
+    openForm,
+    setOpenForm,
+    setCurrentTask,
     filterCategory,
     setFilterCategory,
     filterDate,
@@ -48,8 +50,10 @@ const Dashboard = () => {
     setSearchQuery,
   } = useTask();
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleAddTask = () => {
+    setCurrentTask(null);
+    setOpenForm(true);
+  };
 
   const handleCategoryChange = (event: SelectChangeEvent<string>) => {
     setFilterCategory(event.target.value);
@@ -207,9 +211,9 @@ const Dashboard = () => {
               onChange={handleCategoryChange}
               sx={{ minWidth: 120, borderRadius: 5 }}
             >
-              <MenuItem value="all">All</MenuItem>
-              <MenuItem value="work">Work</MenuItem>
-              <MenuItem value="personal">Personal</MenuItem>
+              <MenuItem value="All">All</MenuItem>
+              <MenuItem value="Work">Work</MenuItem>
+              <MenuItem value="Personal">Personal</MenuItem>
             </Select>
           </FormControl>
 
@@ -225,7 +229,7 @@ const Dashboard = () => {
                   sx: { height: 40, minWidth: 150 },
                   helperText: filterDate
                     ? `Showing for ${filterDate.format(
-                        "Do MMMM, YYYY"
+                        "Do MMM, YYYY"
                       )} & previous dates`
                     : "Showing for all dates",
                 },
@@ -257,7 +261,7 @@ const Dashboard = () => {
           <Button
             variant="contained"
             sx={{ minWidth: "150px", height: "60px" }}
-            onClick={handleOpen}
+            onClick={handleAddTask}
           >
             <Typography variant="body1" fontSize="18px">
               ADD TASK
@@ -272,7 +276,7 @@ const Dashboard = () => {
       <Box>{view === "list" ? <ListView /> : <BoardView />}</Box>
 
       {/* Dialog to create task */}
-      {open && <TaskForm open={open} handleClose={handleClose} />}
+      {openForm && <TaskForm />}
     </Box>
   );
 };
