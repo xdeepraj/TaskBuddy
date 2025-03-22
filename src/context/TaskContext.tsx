@@ -213,7 +213,6 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
       });
 
       await Promise.all(updatePromises);
-      console.log("Tasks status updated successfully");
     } catch (error) {
       console.error("Error updating tasks status:", error);
     }
