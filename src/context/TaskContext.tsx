@@ -43,7 +43,12 @@ interface TaskContextType {
   addTask: (task: Task) => void;
   updateTask: (updatedTask: Task) => void;
   deleteTask: (taskId: string) => void;
-  clearTask: () => void;
+
+  updateMultipleTasksStatus: (
+    tasksToUpdate: Task[],
+    newStatus: string
+  ) => Promise<void>;
+  deleteMultipleTasks: (tasksToDelete: Task[]) => Promise<void>;
 
   // form
   openForm: boolean;
@@ -191,16 +196,46 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Clear current task data
-  const clearTask = () => {
-    setCurrentTask({
-      title: "",
-      description: "",
-      category: "",
-      dueDate: null,
-      status: "",
-      attachment: null,
-    });
+  // Update status of multiple tasks
+  const updateMultipleTasksStatus = async (
+    tasksToUpdate: Task[],
+    newStatus: string
+  ) => {
+    if (tasksToUpdate.length === 0) return;
+
+    try {
+      // Run all updates in parallel
+      const updatePromises = tasksToUpdate.map((task) => {
+        if (!task.id) return null;
+
+        const taskRef = doc(db, "tasks", task.id);
+        return updateDoc(taskRef, { status: newStatus });
+      });
+
+      await Promise.all(updatePromises);
+      console.log("Tasks status updated successfully");
+    } catch (error) {
+      console.error("Error updating tasks status:", error);
+    }
+  };
+
+  // Delete multiple tasks
+  const deleteMultipleTasks = async (tasksToDelete: Task[]) => {
+    if (tasksToDelete.length === 0) return;
+
+    try {
+      // Run all deletions in parallel
+      const deletePromises = tasksToDelete.map((task) => {
+        if (!task.id) return null;
+
+        const taskRef = doc(db, "tasks", task.id);
+        return deleteDoc(taskRef);
+      });
+
+      await Promise.all(deletePromises);
+    } catch (error) {
+      console.error("Error deleting tasks:", error);
+    }
   };
 
   return (
@@ -215,13 +250,14 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
         addTask,
         updateTask,
         deleteTask,
-        clearTask,
         filterCategory,
         setFilterCategory,
         filterDate,
         setFilterDate,
         searchQuery,
         setSearchQuery,
+        updateMultipleTasksStatus,
+        deleteMultipleTasks,
       }}
     >
       {children}

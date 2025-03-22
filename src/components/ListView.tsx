@@ -16,6 +16,7 @@ import {
   Stack,
   Menu,
   MenuItem,
+  Checkbox,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import SubdirectoryArrowLeftIcon from "@mui/icons-material/SubdirectoryArrowLeft";
@@ -54,6 +55,10 @@ interface Task {
   attachment: File | null;
 }
 
+interface StatusChangePopupProps {
+  onUpdateStatus: (status: string) => void;
+}
+
 const ListView = () => {
   const {
     tasks,
@@ -66,6 +71,8 @@ const ListView = () => {
     deleteTask,
     setCurrentTask,
     setOpenForm,
+    updateMultipleTasksStatus,
+    deleteMultipleTasks,
   } = useTask();
 
   // Determine which array to display based on filters
@@ -89,6 +96,8 @@ const ListView = () => {
 
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  const [batchTasks, setBatchTasks] = useState<Task[]>([]);
 
   const missingFields: string[] = [];
   if (!newTask.title) missingFields.push("TASK TITLE");
@@ -201,6 +210,64 @@ const ListView = () => {
   const handleEdit = (selectedTask: any) => {
     setCurrentTask(selectedTask);
     setOpenForm(true);
+  };
+
+  const handleCheckboxChange = (task: Task) => {
+    setBatchTasks((prev) =>
+      prev.some((selectedTask) => selectedTask.id === task.id)
+        ? prev.filter((selectedTask) => selectedTask.id !== task.id)
+        : [...prev, task]
+    );
+  };
+
+  const batchUpdateStatus = (newStatus: any) => {
+    updateMultipleTasksStatus(batchTasks, newStatus);
+    setBatchTasks([]);
+  };
+
+  const batchDeleteTasks = () => {
+    deleteMultipleTasks(batchTasks);
+    setBatchTasks([]);
+  };
+
+  const StatusChangePopup: React.FC<StatusChangePopupProps> = ({
+    onUpdateStatus,
+  }) => {
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+      setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
+
+    const handleStatusChange = (status: string) => {
+      onUpdateStatus(status);
+      handleClose();
+    };
+
+    return (
+      <>
+        <Button variant="outlined" color="primary" onClick={handleClick}>
+          Change Status
+        </Button>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+        >
+          <MenuItem onClick={() => handleStatusChange("TODO")}>TODO</MenuItem>
+          <MenuItem onClick={() => handleStatusChange("IN PROGRESS")}>
+            IN PROGRESS
+          </MenuItem>
+          <MenuItem onClick={() => handleStatusChange("COMPLETED")}>
+            COMPLETED
+          </MenuItem>
+        </Menu>
+      </>
+    );
   };
 
   return (
@@ -484,66 +551,6 @@ const ListView = () => {
                     </>
                   )}
 
-                  {/* Show edit & delete when three dot is clicked */}
-                  {
-                    <Menu
-                      anchorEl={menuAnchor}
-                      open={Boolean(menuAnchor)}
-                      onClose={handleMenuClose}
-                    >
-                      <MenuItem
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 1,
-                        }}
-                      >
-                        <Box
-                          onClick={() => {
-                            handleEdit(selectedTask);
-                            handleMenuClose();
-                          }}
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          <BorderColorIcon sx={{ fontSize: 15, mr: 2 }} />
-                          <Typography variant="body2" fontSize="18px">
-                            Edit
-                          </Typography>
-                        </Box>
-                      </MenuItem>
-                      <MenuItem
-                        onClick={() => {
-                          if (selectedTask?.id) {
-                            deleteTask(selectedTask.id);
-                          }
-                          handleMenuClose();
-                        }}
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 1,
-                        }}
-                      >
-                        <Box
-                          component="img"
-                          src={deleteicon}
-                          alt="Delete"
-                          sx={{ width: 15, height: 15 }}
-                        />
-                        <Typography
-                          variant="body2"
-                          fontSize="18px"
-                          color="error.main"
-                        >
-                          Delete
-                        </Typography>
-                      </MenuItem>
-                    </Menu>
-                  }
-
                   {taskAccordion.taskList.length > 0 ? (
                     taskAccordion.taskList.map((task: Task, idx: number) => (
                       <Draggable
@@ -567,7 +574,7 @@ const ListView = () => {
                               borderRadius: "4px",
                             }}
                           >
-                            {/* Drag indicator + check/uncheck + Title */}
+                            {/* Checkbox + drag indicator + check/uncheck + Title */}
                             <Box
                               sx={{
                                 display: "flex",
@@ -575,6 +582,13 @@ const ListView = () => {
                                 gap: 1,
                               }}
                             >
+                              <Checkbox
+                                checked={batchTasks.some(
+                                  (selectedTask) => selectedTask.id === task.id
+                                )}
+                                onChange={() => handleCheckboxChange(task)}
+                              />
+
                               <DragIndicatorIcon />
                               <img
                                 src={
@@ -684,6 +698,102 @@ const ListView = () => {
 
       {/* Render Task Form for Adding a New Task */}
       <TaskForm />
+
+      {/* Show edit & delete when three dot is clicked */}
+      {
+        <Menu
+          anchorEl={menuAnchor}
+          open={Boolean(menuAnchor)}
+          onClose={handleMenuClose}
+        >
+          <MenuItem
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            <Box
+              onClick={() => {
+                handleEdit(selectedTask);
+                handleMenuClose();
+              }}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <BorderColorIcon sx={{ fontSize: 15, mr: 2 }} />
+              <Typography variant="body2" fontSize="18px">
+                Edit
+              </Typography>
+            </Box>
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              if (selectedTask?.id) {
+                deleteTask(selectedTask.id);
+              }
+              handleMenuClose();
+            }}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            <Box
+              component="img"
+              src={deleteicon}
+              alt="Delete"
+              sx={{ width: 15, height: 15 }}
+            />
+            <Typography variant="body2" fontSize="18px" color="error.main">
+              Delete
+            </Typography>
+          </MenuItem>
+        </Menu>
+      }
+
+      {/* Batch Update Popup */}
+      {batchTasks.length > 0 && (
+        <Box
+          sx={{
+            position: "fixed",
+            bottom: 20,
+            left: "50%",
+            transform: "translateX(-50%)",
+            backgroundColor: "black",
+            borderRadius: "15px",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            padding: "8px 16px",
+            zIndex: 1000,
+            whiteSpace: "nowrap",
+          }}
+        >
+          <Typography
+            color="white"
+            sx={{
+              border: "1px solid #333",
+              padding: "5px 12px",
+              borderRadius: "15px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {batchTasks.length} Task{batchTasks.length > 1 ? "s" : ""} selected
+          </Typography>
+
+          {/* Status Change Popup */}
+          <StatusChangePopup onUpdateStatus={batchUpdateStatus} />
+
+          <Button variant="outlined" color="error" onClick={batchDeleteTasks}>
+            Delete all
+          </Button>
+        </Box>
+      )}
     </Paper>
   );
 };

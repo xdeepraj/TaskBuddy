@@ -227,11 +227,14 @@ const Dashboard = () => {
                 textField: {
                   size: "small",
                   sx: { height: 40, minWidth: 150 },
-                  helperText: filterDate
-                    ? `Showing for ${filterDate.format(
-                        "Do MMM, YYYY"
-                      )} & previous dates`
-                    : "Showing for all dates",
+                  helperText: filterDate ? (
+                    <span style={{ color: "#f57c00" }}>
+                      Showing for {filterDate.format("Do MMM, YYYY")} & previous
+                      dates
+                    </span>
+                  ) : (
+                    "Showing for all dates"
+                  ),
                 },
               }}
             />
