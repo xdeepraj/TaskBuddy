@@ -64,12 +64,13 @@ const TaskForm: React.FC = () => {
       setCreateDescription(currentTask.description);
       setCreateCategory(currentTask.category);
 
-      // Check if the dueDate is already a valid Dayjs instance
-      const dueDate: Dayjs | null = dayjs.isDayjs(currentTask.dueDate)
-        ? currentTask.dueDate
-        : currentTask.dueDate
-        ? dayjs(currentTask.dueDate.seconds * 1000)
-        : null;
+      // Check if dueDate is a Firestore Timestamp
+      const dueDate: Dayjs | null =
+        currentTask.dueDate && "seconds" in currentTask.dueDate
+          ? dayjs(currentTask.dueDate.toDate())
+          : dayjs.isDayjs(currentTask.dueDate)
+          ? currentTask.dueDate
+          : null;
 
       setCreateDate(dueDate);
       setCreateStatus(currentTask.status);
