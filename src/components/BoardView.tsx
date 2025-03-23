@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Typography,
@@ -51,10 +51,6 @@ const BoardView = () => {
     filterCategory === "All" && !filterDate && !searchQuery
       ? tasks
       : filteredTasks;
-
-  useEffect(() => {
-    console.log("displayTasks: ", displayTasks);
-  }, [displayTasks]);
 
   const columns = [
     { title: "TODO", color: "#d1aaff" },

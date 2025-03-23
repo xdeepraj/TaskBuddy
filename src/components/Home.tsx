@@ -32,15 +32,21 @@ const Home = () => {
               flex: 5,
               display: "flex",
               flexDirection: "column",
-              alignItems: "flex-start",
-              justifyContent: "center",
+              textAlign: { xs: "center", md: "left" },
+              justifyContent: { xs: "flex-end", md: "center" },
             }}
           >
-            <Stack sx={{ px: 10 }}>
+            <Stack
+              sx={{
+                px: { xs: 2, sm: 4, md: 10 },
+              }}
+            >
               <Box
                 sx={{
                   display: "flex",
                   mb: 1,
+                  alignItems: "center",
+                  justifyContent: { xs: "center", md: "flex-start" },
                 }}
               >
                 <img
@@ -78,10 +84,9 @@ const Home = () => {
                 sx={{
                   backgroundColor: "#292929",
                   fontFamily: "'Urbanist', sans-serif",
-                  fontSize: "22px",
+                  fontSize: { xs: "16px", md: "22px" },
                   px: 8,
                   py: 2,
-
                   display: "flex",
                   alignItems: "center",
                   gap: 2,
@@ -110,54 +115,183 @@ const Home = () => {
               flex: 5,
             }}
           >
-            {/* Outer Circle */}
+            {/* Three Circle design*/}
             <Box
               sx={{
                 position: "absolute",
+                top: "20",
+                left: "30",
                 width: "50vw",
                 height: "50vw",
-                border: "1px solid",
-                borderColor: "primary.main",
-                borderRadius: "50%",
-                zIndex: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
-            />
-            {/* Middle Circle */}
+            >
+              {/* Outer Circle */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  width: "50vw",
+                  height: "50vw",
+                  border: "1px solid",
+                  borderColor: "primary.main",
+                  borderRadius: "50%",
+                  zIndex: 1,
+                }}
+              />
+              {/* Middle Circle */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  width: "40vw",
+                  height: "40vw",
+                  border: "2px solid",
+                  borderColor: "primary.main",
+                  borderRadius: "50%",
+                  zIndex: 2,
+                }}
+              />
+              {/* Inner Circle */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  width: "30vw",
+                  height: "30vw",
+                  border: "3px solid",
+                  borderColor: "primary.main",
+                  borderRadius: "50%",
+                  zIndex: 3,
+                }}
+              />
+            </Box>
+
+            {/* Dashboard Image*/}
             <Box
               sx={{
-                position: "absolute",
-                width: "40vw",
-                height: "40vw",
-                border: "2px solid",
-                borderColor: "primary.main",
-                borderRadius: "50%",
-                zIndex: 2,
-              }}
-            />
-            {/* Inner Circle */}
-            <Box
-              sx={{
-                position: "absolute",
-                width: "30vw",
-                height: "30vw",
-                border: "3px solid",
-                borderColor: "primary.main",
-                borderRadius: "50%",
-                zIndex: 3,
-              }}
-            />
-            <img
-              src={dashboardView}
-              alt="Dashboard View"
-              style={{
                 position: "absolute",
                 left: 150,
                 width: "90vw",
-                zIndex: 4,
+                backgroundColor: "white",
                 boxShadow: "10px 10px 40px rgba(0, 0, 0, 0.3)",
                 borderRadius: "15px",
+                display: { xs: "none", md: "block" },
+                zIndex: 4,
               }}
-            />
+            >
+              <img
+                src={dashboardView}
+                alt="Dashboard View"
+                style={{
+                  width: "100%",
+                  borderRadius: "15px",
+                }}
+              />
+            </Box>
+
+            {/* Three Circle design for mobile only*/}
+            <Box
+              sx={{
+                display: { xs: "flex", md: "none" },
+                position: "fixed",
+                top: -75,
+                right: -75,
+                width: "50vw",
+                height: "50vw",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 100,
+              }}
+            >
+              {/* Outer Circle */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  width: "50vw",
+                  height: "50vw",
+                  border: "1px solid",
+                  borderColor: "primary.main",
+                  borderRadius: "50%",
+                  zIndex: 1,
+                }}
+              />
+              {/* Middle Circle */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  width: "40vw",
+                  height: "40vw",
+                  border: "2px solid",
+                  borderColor: "primary.main",
+                  borderRadius: "50%",
+                  zIndex: 2,
+                }}
+              />
+              {/* Inner Circle */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  width: "30vw",
+                  height: "30vw",
+                  border: "3px solid",
+                  borderColor: "primary.main",
+                  borderRadius: "50%",
+                  zIndex: 3,
+                }}
+              />
+            </Box>
+
+            {/* Three Circle design for mobile only*/}
+            <Box
+              sx={{
+                display: { xs: "flex", md: "none" },
+                position: "fixed",
+                top: 65,
+                left: -120,
+                width: "50vw",
+                height: "50vw",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 100,
+              }}
+            >
+              {/* Outer Circle */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  width: "50vw",
+                  height: "50vw",
+                  border: "1px solid",
+                  borderColor: "primary.main",
+                  borderRadius: "50%",
+                  zIndex: 1,
+                }}
+              />
+              {/* Middle Circle */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  width: "40vw",
+                  height: "40vw",
+                  border: "2px solid",
+                  borderColor: "primary.main",
+                  borderRadius: "50%",
+                  zIndex: 2,
+                }}
+              />
+              {/* Inner Circle */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  width: "30vw",
+                  height: "30vw",
+                  border: "3px solid",
+                  borderColor: "primary.main",
+                  borderRadius: "50%",
+                  zIndex: 3,
+                }}
+              />
+            </Box>
           </Box>
         </Box>
       )}

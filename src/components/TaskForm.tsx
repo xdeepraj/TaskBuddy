@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
-
 import {
   Button,
   Typography,
@@ -271,10 +270,10 @@ const TaskForm: React.FC = () => {
 
           {/* For category, date, status */}
           <Stack
-            direction="row"
-            alignItems="center"
+            direction={{ xs: "column", md: "row" }}
+            alignItems={{ xs: "flex-start", md: "center" }}
             justifyContent="flex-start"
-            spacing={15}
+            spacing={{ xs: 2, md: 15 }}
           >
             <Stack direction="column">
               <Typography>Task Category*</Typography>
@@ -385,7 +384,10 @@ const TaskForm: React.FC = () => {
           <Typography
             variant="caption"
             color="error"
-            sx={{ alignSelf: "flex-end" }}
+            sx={{
+              alignSelf: { xs: "center", md: "flex-end" },
+              textAlign: { xs: "center", md: "right" },
+            }}
           >
             {`**PLEASE PROVIDE: ${missingFields.join(", ")} to create a task.`}
           </Typography>

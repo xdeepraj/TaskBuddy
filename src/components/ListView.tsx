@@ -17,6 +17,8 @@ import {
   Menu,
   MenuItem,
   Checkbox,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import SubdirectoryArrowLeftIcon from "@mui/icons-material/SubdirectoryArrowLeft";
@@ -60,6 +62,9 @@ interface StatusChangePopupProps {
 }
 
 const ListView = () => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
   const {
     tasks,
     filteredTasks,
@@ -250,7 +255,12 @@ const ListView = () => {
 
     return (
       <>
-        <Button variant="outlined" color="primary" onClick={handleClick}>
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={handleClick}
+          sx={{ fontSize: isSmallScreen ? "12px" : "14px" }}
+        >
           Change Status
         </Button>
         <Menu
@@ -273,24 +283,27 @@ const ListView = () => {
   return (
     <Paper
       sx={{
-        padding: 2,
+        padding: { md: 2 },
+        marginTop: { xs: 2 },
         backgroundColor: "transparent",
         boxShadow: "none",
       }}
     >
       {/* Header */}
-      <Box
-        sx={{
-          display: "flex",
-          padding: 1,
-        }}
-      >
-        <Typography sx={{ width: "50%" }}>Task Name</Typography>
-        <Typography sx={{ width: "20%" }}>Due On</Typography>
-        <Typography sx={{ width: "20%" }}>Task Status</Typography>
-        <Typography sx={{ width: "20%" }}>Task Category</Typography>
-        <Typography sx={{ width: "10%" }}></Typography>
-      </Box>
+      {!isSmallScreen && (
+        <Box
+          sx={{
+            display: "flex",
+            padding: 1,
+          }}
+        >
+          <Typography sx={{ width: "50%" }}>Task Name</Typography>
+          <Typography sx={{ width: "20%" }}>Due On</Typography>
+          <Typography sx={{ width: "20%" }}>Task Status</Typography>
+          <Typography sx={{ width: "20%" }}>Task Category</Typography>
+          <Typography sx={{ width: "10%" }}></Typography>
+        </Box>
+      )}
 
       {/* Dynamically Render Task Accordions */}
       <DragDropContext onDragEnd={onDragEnd}>
@@ -331,7 +344,7 @@ const ListView = () => {
                   }}
                 >
                   {/* Show "Add Task" button if the showAddButton is true */}
-                  {taskAccordion.showAddButton && (
+                  {!isSmallScreen && taskAccordion.showAddButton && (
                     <>
                       <Button
                         variant="text"
@@ -565,7 +578,11 @@ const ListView = () => {
                             {...provided.dragHandleProps}
                             sx={{
                               display: "grid",
-                              gridTemplateColumns: "5fr 2fr 2fr 2fr 1fr",
+                              // gridTemplateColumns: "5fr 2fr 2fr 2fr 1fr",
+                              gridTemplateColumns: {
+                                xs: "1fr auto",
+                                md: "5fr 2fr 2fr 2fr 1fr",
+                              },
                               gap: 2,
                               padding: 1,
                               alignItems: "center",
@@ -579,7 +596,6 @@ const ListView = () => {
                               sx={{
                                 display: "flex",
                                 alignItems: "center",
-                                gap: 1,
                               }}
                             >
                               <Checkbox
@@ -590,6 +606,7 @@ const ListView = () => {
                               />
 
                               <DragIndicatorIcon />
+
                               <img
                                 src={
                                   task.status === "COMPLETED"
@@ -623,43 +640,51 @@ const ListView = () => {
                             </Box>
 
                             {/* Due Date */}
-                            <Box>
-                              <Typography variant="body1">
-                                {task.dueDate
-                                  ? dayjs(task.dueDate.toDate()).format(
-                                      "DD MMM, YYYY"
-                                    )
-                                  : "No due date"}
-                              </Typography>
-                            </Box>
+                            {!isSmallScreen && (
+                              <Box>
+                                <Typography variant="body1">
+                                  {task.dueDate
+                                    ? dayjs(task.dueDate.toDate()).format(
+                                        "DD MMM, YYYY"
+                                      )
+                                    : "No due date"}
+                                </Typography>
+                              </Box>
+                            )}
 
                             {/* Task Status */}
-                            <Box sx={{ display: "flex", alignItems: "center" }}>
-                              <Typography
-                                variant="body1"
-                                sx={{
-                                  backgroundColor: "#dddadd",
-                                  px: 1,
-                                  py: 0.5,
-                                  borderRadius: "4px",
-                                  fontSize: "15px",
-                                  display: "inline-block",
-                                  width: "fit-content",
-                                }}
+                            {!isSmallScreen && (
+                              <Box
+                                sx={{ display: "flex", alignItems: "center" }}
                               >
-                                {task.status}
-                              </Typography>
-                            </Box>
+                                <Typography
+                                  variant="body1"
+                                  sx={{
+                                    backgroundColor: "#dddadd",
+                                    px: 1,
+                                    py: 0.5,
+                                    borderRadius: "4px",
+                                    fontSize: "15px",
+                                    display: "inline-block",
+                                    width: "fit-content",
+                                  }}
+                                >
+                                  {task.status}
+                                </Typography>
+                              </Box>
+                            )}
 
                             {/* Category */}
-                            <Box>
-                              <Typography variant="body1">
-                                {task.category}
-                              </Typography>
-                            </Box>
+                            {!isSmallScreen && (
+                              <Box>
+                                <Typography variant="body1">
+                                  {task.category}
+                                </Typography>
+                              </Box>
+                            )}
 
                             {/* Actions */}
-                            <Box>
+                            <Box sx={{ ml: { xs: "auto", md: 0 } }}>
                               <IconButton
                                 onClick={(e) => handleMenuOpen(e, task)}
                               >
@@ -765,13 +790,14 @@ const ListView = () => {
             transform: "translateX(-50%)",
             backgroundColor: "black",
             borderRadius: "15px",
-            display: "inline-flex",
+            display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 2,
-            padding: "8px 16px",
+            gap: isSmallScreen ? 0.5 : 2,
+            padding: isSmallScreen ? "8px 12px" : "8px 16px",
             zIndex: 1000,
             whiteSpace: "nowrap",
+            maxWidth: "90vw",
           }}
         >
           <Typography
@@ -789,7 +815,12 @@ const ListView = () => {
           {/* Status Change Popup */}
           <StatusChangePopup onUpdateStatus={batchUpdateStatus} />
 
-          <Button variant="outlined" color="error" onClick={batchDeleteTasks}>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={batchDeleteTasks}
+            sx={{ fontSize: isSmallScreen ? "12px" : "14px" }}
+          >
             Delete all
           </Button>
         </Box>
