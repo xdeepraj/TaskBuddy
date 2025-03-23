@@ -284,7 +284,7 @@ const ListView = () => {
     <Paper
       sx={{
         padding: { md: 2 },
-        marginTop: { xs: 2 },
+        marginTop: { xs: 2, md: 0 },
         backgroundColor: "transparent",
         boxShadow: "none",
       }}
@@ -627,7 +627,8 @@ const ListView = () => {
                                 sx={{
                                   overflow: "hidden",
                                   textOverflow: "ellipsis",
-                                  whiteSpace: "nowrap",
+                                  whiteSpace: "normal",
+                                  wordBreak: "break-word",
                                   textDecoration:
                                     task.status === "COMPLETED"
                                       ? "line-through"

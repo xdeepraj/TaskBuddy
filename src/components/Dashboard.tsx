@@ -83,276 +83,321 @@ const Dashboard = () => {
         height: "100vh",
         overflowY: "auto",
         backgroundColor: "white",
-        p: 2,
       }}
     >
-      {/* First row, left: Icon+name, right: Avatar+username */}
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
-        spacing={2}
+      <Box
+        sx={{
+          width: "100%",
+          backgroundColor: { xs: "#f5f5f5", md: "transparent" },
+          py: 1,
+          px: 1,
+        }}
       >
-        {/* left: Icon+name */}
-        <Stack direction="row" alignItems="center">
-          {!isSmallScreen && (
-            <img
-              src={BWIcon}
-              alt="Main Icon"
-              style={{ width: 30, height: 30 }}
-            />
-          )}
-          <Typography
-            variant="body1"
-            fontSize={{ xs: "18px", md: "28px" }}
-            fontWeight="600"
-          >
-            TaskBuddy
-          </Typography>
-        </Stack>
-
-        {/* right: Avatar+username */}
+        {/* First row, left: Icon+name, right: Avatar+username */}
         <Stack
           direction="row"
           alignItems="center"
           justifyContent="space-between"
-          spacing={1}
+          spacing={2}
+          sx={{
+            backgroundColor: { xs: "#f5f5f5", md: "transparent" },
+          }}
         >
-          <Avatar
-            src={user?.photoURL || ""}
-            alt="Profile picture"
-            sx={{ width: 30, height: 30 }}
-          />
-          {!isSmallScreen && (
-            <Typography variant="body1">{username}</Typography>
-          )}
-        </Stack>
-      </Stack>
-
-      {/* Second row, left: View Selector: List | Board, right: logout button */}
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
-        spacing={2}
-        sx={{
-          mt: { xs: 2, md: 0.5 },
-        }}
-      >
-        {/* left: View Selector: List | Board */}
-        {!isSmallScreen ? (
-          <Stack direction="row">
-            <Button
-              onClick={handleView}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 0.5,
-                borderBottom:
-                  view === "list" ? "2px solid rgb(0, 0, 0)" : "none",
-                borderRadius: 0,
-                pb: 0.5,
-              }}
-            >
-              <img
-                src={ListIcon}
-                alt="List Icon"
-                style={{ width: 20, height: 20 }}
-              />
-              <Typography variant="body1" fontSize="20px">
-                List
-              </Typography>
-            </Button>
-
-            <Button
-              onClick={handleBoardView}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 0.5,
-                borderBottom:
-                  view === "board" ? "2px solid rgb(0, 0, 0)" : "none",
-                borderRadius: 0,
-                pb: 0.5,
-              }}
-            >
-              <img
-                src={BoardIcon}
-                alt="Board Icon"
-                style={{ width: 20, height: 20 }}
-              />
-              <Typography variant="body1" fontSize="20px">
-                Board
-              </Typography>
-            </Button>
-          </Stack>
-        ) : (
+          {/* left: Icon+name */}
           <Stack direction="row" alignItems="center">
-            <Button
-              variant="contained"
-              sx={{ width: "20", height: "20" }}
-              onClick={handleAddTask}
-            >
-              <Typography variant="body1" fontSize="16px">
-                ADD TASK
-              </Typography>
-            </Button>
-          </Stack>
-        )}
-
-        {/* right: logout button */}
-        <Stack>
-          <Button
-            variant="contained"
-            sx={{
-              bgcolor: "background.default",
-              color: "black",
-              "&:hover": { bgcolor: "#d32f2f" },
-            }}
-            onClick={logout}
-            startIcon={
+            {!isSmallScreen && (
               <img
-                src={LogoutIcon}
-                alt="Logout"
-                style={{ width: 20, height: 20 }}
+                src={BWIcon}
+                alt="Main Icon"
+                style={{ width: 30, height: 30 }}
               />
-            }
-          >
-            Logout
-          </Button>
-        </Stack>
-      </Stack>
-
-      {/* Third row, left: Filter views, right: Search+add task */}
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
-        spacing={2}
-        mt={3}
-      >
-        {/* left: Filter views */}
-        {!isSmallScreen ? (
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Typography variant="body1" fontSize="15px">
-              Filter by:
+            )}
+            <Typography
+              variant="body1"
+              fontSize={{ xs: "18px", md: "28px" }}
+              fontWeight="600"
+            >
+              TaskBuddy
             </Typography>
+          </Stack>
 
-            <FormControl size="small">
-              <InputLabel>Category</InputLabel>
-              <Select
-                value={filterCategory}
-                label="Category"
-                onChange={handleCategoryChange}
-                sx={{ minWidth: 120, borderRadius: 5 }}
-              >
-                <MenuItem value="All">All</MenuItem>
-                <MenuItem value="Work">Work</MenuItem>
-                <MenuItem value="Personal">Personal</MenuItem>
-              </Select>
-            </FormControl>
-
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                disablePast
-                label="Due Date"
-                value={filterDate}
-                onChange={(newValue) => setFilterDate(newValue)}
-                slotProps={{
-                  textField: {
-                    size: "small",
-                    sx: { height: 40, minWidth: 150 },
-                    helperText: filterDate ? (
-                      <span style={{ color: "#f57c00" }}>
-                        Showing for {filterDate.format("Do MMM, YYYY")} &
-                        previous dates
-                      </span>
-                    ) : (
-                      "Showing for all dates"
-                    ),
-                  },
-                }}
-              />
-            </LocalizationProvider>
-            {/* Clear Filter Button */}
-            {filterDate && (
-              <Button
-                onClick={() => setFilterDate(null)}
-                variant="outlined"
-                size="small"
-              >
-                Clear
-              </Button>
+          {/* right: Avatar+username */}
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            spacing={1}
+          >
+            <Avatar
+              src={user?.photoURL || ""}
+              alt="Profile picture"
+              sx={{ width: 30, height: 30 }}
+            />
+            {!isSmallScreen && (
+              <Typography variant="body1">{username}</Typography>
             )}
           </Stack>
-        ) : (
-          <Stack direction="column" spacing={1} width="100%">
-            <Typography variant="body1" fontSize="15px">
-              Filter by:
-            </Typography>
-            <Stack direction="row" alignItems="center" spacing={2} width="100%">
+        </Stack>
+      </Box>
+
+      <Box
+        sx={{
+          px: 2,
+          pb: isSmallScreen ? 2 : 0,
+        }}
+      >
+        {/* Second row, left: View Selector: List | Board, right: logout button */}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          spacing={2}
+          sx={{
+            mt: { xs: 2, md: 0.5 },
+          }}
+        >
+          {/* left: View Selector: List | Board */}
+          {!isSmallScreen ? (
+            <Stack direction="row">
+              <Button
+                onClick={handleView}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  borderBottom:
+                    view === "list" ? "2px solid rgb(0, 0, 0)" : "none",
+                  borderRadius: 0,
+                  pb: 0.5,
+                }}
+              >
+                <img
+                  src={ListIcon}
+                  alt="List Icon"
+                  style={{ width: 20, height: 20 }}
+                />
+                <Typography variant="body1" fontSize="20px">
+                  List
+                </Typography>
+              </Button>
+
+              <Button
+                onClick={handleBoardView}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  borderBottom:
+                    view === "board" ? "2px solid rgb(0, 0, 0)" : "none",
+                  borderRadius: 0,
+                  pb: 0.5,
+                }}
+              >
+                <img
+                  src={BoardIcon}
+                  alt="Board Icon"
+                  style={{ width: 20, height: 20 }}
+                />
+                <Typography variant="body1" fontSize="20px">
+                  Board
+                </Typography>
+              </Button>
+            </Stack>
+          ) : (
+            <Stack direction="row" alignItems="center">
+              <Button
+                variant="contained"
+                sx={{ width: "20", height: "20" }}
+                onClick={handleAddTask}
+              >
+                <Typography variant="body1" fontSize="16px">
+                  ADD TASK
+                </Typography>
+              </Button>
+            </Stack>
+          )}
+
+          {/* right: logout button */}
+          <Stack>
+            <Button
+              variant="contained"
+              sx={{
+                bgcolor: "background.default",
+                color: "black",
+                "&:hover": { bgcolor: "#d32f2f" },
+              }}
+              onClick={logout}
+              startIcon={
+                <img
+                  src={LogoutIcon}
+                  alt="Logout"
+                  style={{ width: 20, height: 20 }}
+                />
+              }
+            >
+              Logout
+            </Button>
+          </Stack>
+        </Stack>
+
+        {/* Third row, left: Filter views, right: Search+add task */}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          spacing={2}
+          mt={3}
+        >
+          {/* left: Filter views */}
+          {!isSmallScreen ? (
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <Typography variant="body1" fontSize="15px">
+                Filter by:
+              </Typography>
+
               <FormControl size="small">
                 <InputLabel>Category</InputLabel>
                 <Select
                   value={filterCategory}
                   label="Category"
                   onChange={handleCategoryChange}
-                  sx={{ minWidth: 100, borderRadius: 5 }}
+                  sx={{ minWidth: 120, borderRadius: 5 }}
                 >
                   <MenuItem value="All">All</MenuItem>
                   <MenuItem value="Work">Work</MenuItem>
                   <MenuItem value="Personal">Personal</MenuItem>
                 </Select>
               </FormControl>
+
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  disablePast
+                  label="Due Date"
+                  value={filterDate}
+                  onChange={(newValue) => setFilterDate(newValue)}
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      sx: { height: 40, minWidth: 150 },
+                      helperText: filterDate ? (
+                        <span style={{ color: "#f57c00" }}>
+                          Showing for {filterDate.format("Do MMM, YYYY")} &
+                          previous dates
+                        </span>
+                      ) : (
+                        "Showing for all dates"
+                      ),
+                    },
+                  }}
+                />
+              </LocalizationProvider>
+              {/* Clear Filter Button */}
+              {filterDate && (
+                <Button
+                  onClick={() => setFilterDate(null)}
+                  variant="outlined"
+                  size="small"
+                >
+                  Clear
+                </Button>
+              )}
+            </Stack>
+          ) : (
+            <Stack direction="column" spacing={1} width="100%">
+              <Typography variant="body1" fontSize="15px">
+                Filter by:
+              </Typography>
               <Stack
                 direction="row"
                 alignItems="center"
-                sx={{ flexGrow: 1, justifyContent: "flex-start" }}
-                spacing={1}
+                spacing={2}
+                width="100%"
               >
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    disablePast
-                    label="Due Date"
-                    value={filterDate}
-                    onChange={(newValue) => setFilterDate(newValue)}
-                    slotProps={{
-                      textField: {
-                        size: "small",
-                        sx: { height: 40, width: "160px" },
-                        helperText: filterDate ? (
-                          <span style={{ color: "#f57c00" }}>
-                            Showing for {filterDate.format("Do MMM, YYYY")} &
-                            previous dates
-                          </span>
-                        ) : (
-                          "Showing for all dates"
-                        ),
-                      },
-                    }}
-                  />
-                </LocalizationProvider>
-                <Stack direction="row" alignItems="flex-end">
-                  {/* Clear Filter Button */}
-                  {filterDate && (
-                    <Button
-                      onClick={() => setFilterDate(null)}
-                      variant="outlined"
-                      size="small"
-                      sx={{ ml: "auto", minWidth: "40px", padding: "5px" }}
-                    >
-                      Clear
-                    </Button>
-                  )}
+                <FormControl size="small">
+                  <InputLabel>Category</InputLabel>
+                  <Select
+                    value={filterCategory}
+                    label="Category"
+                    onChange={handleCategoryChange}
+                    sx={{ minWidth: 100, borderRadius: 5 }}
+                  >
+                    <MenuItem value="All">All</MenuItem>
+                    <MenuItem value="Work">Work</MenuItem>
+                    <MenuItem value="Personal">Personal</MenuItem>
+                  </Select>
+                </FormControl>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  sx={{ flexGrow: 1, justifyContent: "flex-start" }}
+                  spacing={1}
+                >
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      disablePast
+                      label="Due Date"
+                      value={filterDate}
+                      onChange={(newValue) => setFilterDate(newValue)}
+                      slotProps={{
+                        textField: {
+                          size: "small",
+                          sx: { height: 40, width: "160px" },
+                          helperText: filterDate ? (
+                            <span style={{ color: "#f57c00" }}>
+                              Showing for {filterDate.format("Do MMM, YYYY")} &
+                              previous dates
+                            </span>
+                          ) : (
+                            "Showing for all dates"
+                          ),
+                        },
+                      }}
+                    />
+                  </LocalizationProvider>
+                  <Stack direction="row" alignItems="flex-end">
+                    {/* Clear Filter Button */}
+                    {filterDate && (
+                      <Button
+                        onClick={() => setFilterDate(null)}
+                        variant="outlined"
+                        size="small"
+                        sx={{ ml: "auto", minWidth: "40px", padding: "5px" }}
+                      >
+                        Clear
+                      </Button>
+                    )}
+                  </Stack>
                 </Stack>
               </Stack>
             </Stack>
-          </Stack>
-        )}
+          )}
 
-        {/* right: Search+add task */}
-        {!isSmallScreen && (
-          <Stack direction="row" alignItems="center" spacing={2}>
+          {/* right: Search+add task */}
+          {!isSmallScreen && (
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <TextField
+                label="Search"
+                variant="outlined"
+                fullWidth
+                value={searchQuery}
+                onChange={handleSearch}
+              />
+
+              <Button
+                variant="contained"
+                sx={{ minWidth: "150px", height: "60px" }}
+                onClick={handleAddTask}
+              >
+                <Typography variant="body1" fontSize="18px">
+                  ADD TASK
+                </Typography>
+              </Button>
+            </Stack>
+          )}
+        </Stack>
+
+        {isSmallScreen && (
+          <Stack direction="row" mt={filterDate ? 6 : 4}>
             <TextField
               label="Search"
               variant="outlined"
@@ -360,39 +405,19 @@ const Dashboard = () => {
               value={searchQuery}
               onChange={handleSearch}
             />
-
-            <Button
-              variant="contained"
-              sx={{ minWidth: "150px", height: "60px" }}
-              onClick={handleAddTask}
-            >
-              <Typography variant="body1" fontSize="18px">
-                ADD TASK
-              </Typography>
-            </Button>
           </Stack>
         )}
-      </Stack>
 
-      {isSmallScreen && (
-        <Stack direction="row" mt={filterDate ? 6 : 4}>
-          <TextField
-            label="Search"
-            variant="outlined"
-            fullWidth
-            value={searchQuery}
-            onChange={handleSearch}
-          />
-        </Stack>
-      )}
+        {!isSmallScreen && (
+          <Divider sx={{ borderColor: "#e8e8e8", mt: filterDate ? 5 : 3 }} />
+        )}
 
-      {!isSmallScreen && <Divider sx={{ borderColor: "#e8e8e8", mt: 6 }} />}
+        {/* Render List View or Board View */}
+        <Box>{view === "list" ? <ListView /> : <BoardView />}</Box>
 
-      {/* Render List View or Board View */}
-      <Box>{view === "list" ? <ListView /> : <BoardView />}</Box>
-
-      {/* Dialog to create task */}
-      {openForm && <TaskForm />}
+        {/* Dialog to create task */}
+        {openForm && <TaskForm />}
+      </Box>
     </Box>
   );
 };
