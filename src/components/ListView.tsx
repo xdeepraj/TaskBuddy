@@ -578,7 +578,6 @@ const ListView = () => {
                             {...provided.dragHandleProps}
                             sx={{
                               display: "grid",
-                              // gridTemplateColumns: "5fr 2fr 2fr 2fr 1fr",
                               gridTemplateColumns: {
                                 xs: "1fr auto",
                                 md: "5fr 2fr 2fr 2fr 1fr",
@@ -605,7 +604,7 @@ const ListView = () => {
                                 onChange={() => handleCheckboxChange(task)}
                               />
 
-                              <DragIndicatorIcon />
+                              {!isSmallScreen && <DragIndicatorIcon />}
 
                               <img
                                 src={

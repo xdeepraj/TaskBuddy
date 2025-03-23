@@ -297,7 +297,7 @@ const Dashboard = () => {
                   value={filterCategory}
                   label="Category"
                   onChange={handleCategoryChange}
-                  sx={{ minWidth: 120, borderRadius: 5 }}
+                  sx={{ minWidth: 100, borderRadius: 5 }}
                 >
                   <MenuItem value="All">All</MenuItem>
                   <MenuItem value="Work">Work</MenuItem>
@@ -319,7 +319,7 @@ const Dashboard = () => {
                     slotProps={{
                       textField: {
                         size: "small",
-                        sx: { height: 40, width: "180px" },
+                        sx: { height: 40, width: "160px" },
                         helperText: filterDate ? (
                           <span style={{ color: "#f57c00" }}>
                             Showing for {filterDate.format("Do MMM, YYYY")} &
