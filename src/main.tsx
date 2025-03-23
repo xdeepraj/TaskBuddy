@@ -5,6 +5,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { AuthProvider } from "./context/AuthContext";
 import { TaskProvider } from "./context/TaskContext";
+import { ActivityLogProvider } from "./context/ActivityLogContext";
 import Home from "./components/Home";
 import theme from "./theme";
 
@@ -14,11 +15,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <CssBaseline />
       <AuthProvider>
         <TaskProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Home />} />
-            </Routes>
-          </BrowserRouter>
+          <ActivityLogProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Home />} />
+              </Routes>
+            </BrowserRouter>
+          </ActivityLogProvider>
         </TaskProvider>
       </AuthProvider>
     </ThemeProvider>

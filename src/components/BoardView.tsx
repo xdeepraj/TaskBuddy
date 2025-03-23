@@ -10,7 +10,7 @@ import {
   Menu,
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import {
   DragDropContext,
   Droppable,
@@ -21,15 +21,7 @@ import { useTask } from "../context/TaskContext";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import deleteicon from "../assets/delete-icon.svg";
 
-interface Task {
-  id?: string;
-  title: string;
-  description: string;
-  category: string;
-  dueDate: Dayjs | null;
-  status: string;
-  attachment: File | null;
-}
+import { Task } from "../types/types";
 
 const BoardView = () => {
   const {

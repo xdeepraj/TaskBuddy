@@ -47,24 +47,17 @@ import {
   DropResult,
 } from "@hello-pangea/dnd";
 
-interface Task {
-  id?: string; // Firestore will assign this
-  title: string;
-  description: string;
-  category: string;
-  dueDate: Dayjs | null;
-  status: string;
-  attachment: File | null;
-}
-
-interface StatusChangePopupProps {
-  onUpdateStatus: (status: string) => void;
-}
+import { Task } from "../types/types";
+import { useAuth } from "../context/AuthContext";
+import { useActivityLog } from "../context/ActivityLogContext";
+import { StatusChangePopupProps } from "../types/types";
 
 const ListView = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const { logActivity } = useActivityLog();
+  const { user } = useAuth();
   const {
     tasks,
     filteredTasks,
@@ -139,7 +132,7 @@ const ListView = () => {
     },
   ];
 
-  const handleAddTask = () => {
+  const handleAddTask = async () => {
     if (
       !newTask.title ||
       !newTask.dueDate ||
@@ -149,12 +142,16 @@ const ListView = () => {
       return; // Prevent adding if any field is missing
     }
 
-    addTask({
+    const taskId = await addTask({
       ...newTask,
       dueDate: newTask.dueDate,
       description: "",
       attachment: null,
     });
+
+    if (taskId !== null) {
+      await logActivity(taskId, {}, user?.uid ?? "", true);
+    }
 
     // Reset form and hide input fields
     setNewTask({ title: "", dueDate: null, status: "", category: "" });

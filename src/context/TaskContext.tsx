@@ -20,48 +20,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 
-// Task structure
-interface Task {
-  id?: string; // Firestore will assign this
-  title: string;
-  description: string;
-  category: string;
-  dueDate: Dayjs | null;
-  status: string;
-  attachment: File | null;
-}
-
-// shape of the context data that will be available globally
-interface TaskContextType {
-  tasks: Task[]; // Store multiple tasks
-  filteredTasks: Task[];
-  currentTask: Task | null;
-
-  setCurrentTask: (task: Task | null) => void;
-
-  // Function to add, update, delete tasks
-  addTask: (task: Task) => void;
-  updateTask: (updatedTask: Task) => void;
-  deleteTask: (taskId: string) => void;
-
-  updateMultipleTasksStatus: (
-    tasksToUpdate: Task[],
-    newStatus: string
-  ) => Promise<void>;
-  deleteMultipleTasks: (tasksToDelete: Task[]) => Promise<void>;
-
-  // form
-  openForm: boolean;
-  setOpenForm: (open: boolean) => void;
-
-  // Filters
-  filterCategory: string;
-  setFilterCategory: (category: string) => void;
-  filterDate: Dayjs | null;
-  setFilterDate: (date: Dayjs | null) => void;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-}
+import { Task, TaskContextType } from "../types/types";
 
 // TaskContext creation
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -143,8 +102,8 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   }, [tasks, filterCategory, filterDate, debouncedSearchQuery]);
 
   // Add a Task to Firestore and State
-  const addTask = async (task: Task) => {
-    if (!userId) return;
+  const addTask = async (task: Task): Promise<string | null> => {
+    if (!userId) return null;
 
     // Close dialog after adding
     setOpenForm(false);
@@ -159,9 +118,11 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     };
 
     try {
-      await addDoc(collection(db, "tasks"), newTask);
+      const docRef = await addDoc(collection(db, "tasks"), newTask);
+      return docRef.id as string;
     } catch (error) {
       console.error("Error adding task:", error);
+      return null;
     }
   };
 
