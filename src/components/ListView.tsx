@@ -143,7 +143,7 @@ const ListView = () => {
       !newTask.status ||
       !newTask.category
     ) {
-      return; // Prevent adding if any field is missing
+      return;
     }
 
     const taskId = await addTask({

@@ -29,8 +29,10 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
   const userId = user?.uid;
 
-  const [tasks, setTasks] = useState<Task[]>([]); // Store original tasks
-  const [filteredTasks, setFilteredTasks] = useState<Task[]>([]); // Store filtered tasks
+  // Store original tasks
+  const [tasks, setTasks] = useState<Task[]>([]);
+  // Store filtered tasks
+  const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
 
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
   // Dialog state for TaskForm
@@ -43,12 +45,6 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
 
   const [isSearching, setIsSearching] = useState(false);
-  // const isSearchingRef = useRef(false);
-
-  // // Update when search query changes
-  // useEffect(() => {
-  //   isSearchingRef.current = searchQuery !== "";
-  // }, [searchQuery]);
 
   // Fetch Tasks from Firestore when User Logs In & using Firestore Listener
   useEffect(() => {
@@ -77,9 +73,8 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
-      // isSearchingRef.current = searchQuery !== "";
       setIsSearching(searchQuery !== "");
-    }, 500); // Adjust debounce delay as needed
+    }, 500);
 
     return () => clearTimeout(handler);
   }, [searchQuery]);

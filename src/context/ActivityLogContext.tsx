@@ -84,7 +84,8 @@ export const ActivityLogProvider = ({
 
           acc[key] = [oldTimestamp, newTimestamp];
         } else {
-          acc[key] = [oldValue, newValue]; // Store other fields as they are
+          // Store other fields as they are
+          acc[key] = [oldValue, newValue];
         }
         return acc;
       },

@@ -127,7 +127,8 @@ const TaskForm: React.FC = () => {
   // Update editor content when currentTask changes
   useEffect(() => {
     if (editor && currentTask) {
-      editor.commands.setContent(currentTask.description || ""); // Set editor content if currentTask is present
+      // Set editor content if currentTask is present
+      editor.commands.setContent(currentTask.description || "");
     }
   }, [editor, currentTask]);
 
