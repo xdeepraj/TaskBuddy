@@ -1,22 +1,21 @@
 import { Dayjs } from "dayjs";
 import { Timestamp } from "firebase/firestore";
+import { User } from "firebase/auth";
 
-export interface Task {
-  id?: string; // Firestore will assign this
-  title: string;
-  description: string;
-  category: string;
-  dueDate: Dayjs | null;
-  status: string;
-  attachment: File | "";
-  attachmentUrl?: string | null;
+//AuthContext
+export interface AuthContextType {
+  user: User | null;
+  view: "list" | "board";
+  setView: (view: "list" | "board") => void;
+  loginWithGoogle: () => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 //ActivityLogContext
 export interface ActivityLog {
   id?: string;
   taskId: string;
-  changes: Record<string, [any, any]>; // Store multiple field changes
+  changes: Record<string, [any, any]>;
   timestamp: Timestamp;
   userId: string;
   isCreated: boolean;
@@ -36,6 +35,18 @@ export interface ActivityLogContextType {
 //ListView
 export interface StatusChangePopupProps {
   onUpdateStatus: (status: string) => void;
+}
+
+// Task context
+export interface Task {
+  id?: string; // Firestore will assign this
+  title: string;
+  description: string;
+  category: string;
+  dueDate: Dayjs | null;
+  status: string;
+  attachment: File | "";
+  attachmentUrl?: string | null;
 }
 
 export interface TaskContextType {

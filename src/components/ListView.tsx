@@ -223,7 +223,7 @@ const ListView = () => {
     setSelectedTask(null);
   };
 
-  const handleEdit = (selectedTask: any) => {
+  const handleEdit = (selectedTask: Task | null) => {
     setCurrentTask(selectedTask);
     setOpenForm(true);
   };
@@ -236,7 +236,7 @@ const ListView = () => {
     );
   };
 
-  const batchUpdateStatus = async (newStatus: any) => {
+  const batchUpdateStatus = async (newStatus: string) => {
     await Promise.all(
       batchTasks.map((task) =>
         logActivity(

@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from "react";
+import { ChangeEvent, useEffect } from "react";
 import {
   Button,
   Typography,
@@ -41,10 +41,8 @@ const Dashboard = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const { user, logout } = useAuth();
+  const { user, logout, view, setView } = useAuth();
   const username = user?.displayName?.split(" ")[0];
-
-  const [view, setView] = useState<"list" | "board">("list");
 
   const {
     openForm,
@@ -56,8 +54,14 @@ const Dashboard = () => {
     setFilterDate,
     searchQuery,
     setSearchQuery,
-    // setIsSearching,
   } = useTask();
+
+  // Ensure view is 'list' on mobile devices
+  useEffect(() => {
+    if (isSmallScreen && view !== "list") {
+      setView("list");
+    }
+  }, [isSmallScreen, view, setView]);
 
   const handleAddTask = () => {
     setCurrentTask(null);

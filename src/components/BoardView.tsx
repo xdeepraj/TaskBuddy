@@ -65,7 +65,7 @@ const BoardView = () => {
     setSelectedTask(null);
   };
 
-  const handleEdit = (selectedTask: any) => {
+  const handleEdit = (selectedTask: Task | null) => {
     setCurrentTask(selectedTask);
     setOpenForm(true);
   };

@@ -178,6 +178,10 @@ const TaskForm: React.FC = () => {
   };
 
   const handleCreateTask = async () => {
+    // Closing the modal before adding task so that user don't have to wait on the modal
+    // it can take some time to upload file in cloudinary & get the link
+    handleClose();
+
     let fileURL: string | null = null;
     if (selectedFile) {
       fileURL = await uploadFile(selectedFile);
@@ -242,8 +246,6 @@ const TaskForm: React.FC = () => {
         await logActivity(taskId, {}, user?.uid ?? "", true);
       }
     }
-
-    handleClose(); // Close the modal after adding task
   };
 
   const getFilePreview = (fileUrl: string | null) => {
@@ -591,7 +593,7 @@ const TaskForm: React.FC = () => {
                           selected ? (
                             selected
                           ) : (
-                            <span style={{ color: "red" }}>Choose status</span>
+                            <span style={{ color: "grey" }}>Choose status</span>
                           )
                         }
                       >
@@ -939,13 +941,52 @@ const TaskForm: React.FC = () => {
                           selected ? (
                             selected
                           ) : (
-                            <span style={{ color: "gray" }}>Choose status</span>
+                            <span style={{ color: "grey" }}>Choose status</span>
                           )
                         }
                       >
-                        <MenuItem value="TODO">TODO</MenuItem>
-                        <MenuItem value="IN PROGRESS">IN PROGRESS</MenuItem>
-                        <MenuItem value="COMPLETED">COMPLETED</MenuItem>
+                        <MenuItem
+                          value="TODO"
+                          sx={{
+                            transition: "transform 0.2s, font-size 0.5s",
+                            "&:hover": {
+                              color: "#EA00FF",
+                              backgroundColor: "transparent",
+                              transform: "scale(1.1)",
+                              fontSize: "16px",
+                            },
+                          }}
+                        >
+                          TODO
+                        </MenuItem>
+                        <MenuItem
+                          value="IN PROGRESS"
+                          sx={{
+                            transition: "transform 0.2s, font-size 0.5s",
+                            "&:hover": {
+                              color: "#00C6FF",
+                              backgroundColor: "transparent",
+                              transform: "scale(1.1)",
+                              fontSize: "16px",
+                            },
+                          }}
+                        >
+                          IN PROGRESS
+                        </MenuItem>
+                        <MenuItem
+                          value="COMPLETED"
+                          sx={{
+                            transition: "transform 0.2s, font-size 0.5s",
+                            "&:hover": {
+                              color: "#0AFF00",
+                              backgroundColor: "transparent",
+                              transform: "scale(1.1)",
+                              fontSize: "16px",
+                            },
+                          }}
+                        >
+                          COMPLETED
+                        </MenuItem>
                       </Select>
                     </FormControl>
                   </Stack>
