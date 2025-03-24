@@ -8,8 +8,8 @@ export interface Task {
   category: string;
   dueDate: Dayjs | null;
   status: string;
-  attachment: File | null;
-  attachmentUrl?: string;
+  attachment: File | "";
+  attachmentUrl?: string | null;
 }
 
 //ActivityLogContext

@@ -57,16 +57,17 @@ export const ActivityLogProvider = ({
     userId: string,
     isCreated: boolean
   ) => {
-    console.log("into logActivity");
-
     if (!isCreated && Object.keys(changes).length === 0) {
-      console.warn("No changes detected, skipping log");
+      console.warn("No changes detected.");
       return;
     }
 
     // Ensure dueDate is stored as Firestore Timestamp
     const processedChanges = Object.entries(changes).reduce(
       (acc, [key, [oldValue, newValue]]) => {
+        // Skip if the old and new values are identical
+        if (oldValue === newValue) return acc;
+
         if (key === "dueDate") {
           let oldTimestamp = oldValue;
           let newTimestamp = newValue;
@@ -90,6 +91,12 @@ export const ActivityLogProvider = ({
       {} as Record<string, [any, any]>
     );
 
+    // Check if there are no valid changes to log
+    if (!isCreated && Object.keys(processedChanges).length === 0) {
+      console.warn("No valid changes detected.");
+      return;
+    }
+
     const newLog: Omit<ActivityLog, "id"> = {
       taskId,
       changes: processedChanges,
@@ -98,7 +105,6 @@ export const ActivityLogProvider = ({
       isCreated,
     };
 
-    console.log("logActivity newLog: ", newLog);
     await addDoc(collection(db, "activity_logs"), newLog);
   };
 

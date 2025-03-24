@@ -46,6 +46,7 @@ const TaskForm: React.FC = () => {
   const [createDate, setCreateDate] = useState<Dayjs | null>(null);
   const [createStatus, setCreateStatus] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [fileUrl, setFileUrl] = useState<string>("");
 
   const { user } = useAuth();
   const { openForm, setOpenForm, currentTask, addTask, updateTask } = useTask();
@@ -78,6 +79,7 @@ const TaskForm: React.FC = () => {
       setCreateDate(dueDate);
       setCreateStatus(currentTask.status);
       setSelectedFile(currentTask.attachment || null);
+      setFileUrl(currentTask.attachmentUrl || "");
     } else {
       setCreateTitle("");
       setCreateDescription("");
@@ -85,6 +87,7 @@ const TaskForm: React.FC = () => {
       setCreateDate(null);
       setCreateStatus("");
       setSelectedFile(null);
+      setFileUrl("");
     }
   }, [currentTask]);
 
@@ -185,8 +188,8 @@ const TaskForm: React.FC = () => {
       category: createCategory,
       dueDate: createDate,
       status: createStatus,
-      attachment: null,
-      attachmentUrl: fileURL || "",
+      attachment: "",
+      attachmentUrl: fileURL || fileUrl || null,
     };
 
     if (currentTask) {
@@ -866,7 +869,6 @@ const TaskForm: React.FC = () => {
                   direction={{ xs: "column", md: "row" }}
                   alignItems={{ xs: "flex-start", md: "center" }}
                   justifyContent="flex-start"
-                  // spacing={{ md: 15 }}
                   gap={2}
                 >
                   <Stack direction="column">
@@ -911,7 +913,7 @@ const TaskForm: React.FC = () => {
                               {...params}
                               size="small"
                               sx={{
-                                width: "160px",
+                                width: "180px",
                                 backgroundColor: "#f1f1f1",
                               }}
                             />
@@ -924,7 +926,7 @@ const TaskForm: React.FC = () => {
                   <Stack direction="column">
                     <Typography>Task Status*</Typography>
                     <FormControl
-                      sx={{ width: "170px", backgroundColor: "#f1f1f1" }}
+                      sx={{ width: "180px", backgroundColor: "#f1f1f1" }}
                       size="small"
                     >
                       <Select

@@ -26,6 +26,7 @@ import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -146,7 +147,7 @@ const ListView = () => {
       ...newTask,
       dueDate: newTask.dueDate,
       description: "",
-      attachment: null,
+      attachment: "",
     });
 
     if (taskId !== null) {
@@ -179,8 +180,9 @@ const ListView = () => {
     setPopoverType("");
   };
 
-  const onDragEnd = (result: DropResult) => {
-    if (!result.destination) return; // If dropped outside, do nothing
+  const onDragEnd = async (result: DropResult) => {
+    // If dropped outside, do nothing
+    if (!result.destination) return;
 
     const { source, destination, draggableId } = result;
 
@@ -188,10 +190,19 @@ const ListView = () => {
       const movedTask = displayTasks.find((task) => task.id === draggableId);
 
       if (movedTask) {
+        // Update only the status
         updateTask({
           ...movedTask,
-          status: destination.droppableId, // Update only the status
+          status: destination.droppableId,
         });
+
+        // Log the status change
+        await logActivity(
+          draggableId,
+          { status: [source.droppableId, destination.droppableId] },
+          user?.uid ?? "",
+          false
+        );
       }
     }
   };
@@ -222,7 +233,22 @@ const ListView = () => {
     );
   };
 
-  const batchUpdateStatus = (newStatus: any) => {
+  const batchUpdateStatus = async (newStatus: any) => {
+    // console.log("from batchUpdateStatus: ");
+    // console.log("batchTasks: ", batchTasks);
+    // console.log("newStatus: ", newStatus);
+    // create log for every task
+    // Ensure all logging operations complete before updating status
+    await Promise.all(
+      batchTasks.map((task) =>
+        logActivity(
+          task.id ?? "",
+          { status: [task.status, newStatus] },
+          user?.uid ?? "",
+          false
+        )
+      )
+    );
     updateMultipleTasksStatus(batchTasks, newStatus);
     setBatchTasks([]);
   };
@@ -804,9 +830,19 @@ const ListView = () => {
               padding: "5px 12px",
               borderRadius: "15px",
               whiteSpace: "nowrap",
+              display: "flex",
+              alignItems: "center",
+              gap: "2px",
             }}
           >
             {batchTasks.length} Task{batchTasks.length > 1 ? "s" : ""} selected
+            <IconButton
+              size="small"
+              onClick={() => setBatchTasks([])}
+              sx={{ color: "white", padding: "2px" }}
+            >
+              <CloseOutlinedIcon fontSize="small" />
+            </IconButton>
           </Typography>
 
           {/* Status Change Popup */}
