@@ -520,7 +520,6 @@ const TaskForm: React.FC = () => {
                   direction={{ xs: "column", md: "row" }}
                   alignItems={{ xs: "flex-start", md: "center" }}
                   justifyContent="flex-start"
-                  // spacing={{ md: 15 }}
                   gap={2}
                 >
                   <Stack direction="column">
@@ -591,7 +590,7 @@ const TaskForm: React.FC = () => {
                           selected ? (
                             selected
                           ) : (
-                            <span style={{ color: "gray" }}>Choose status</span>
+                            <span style={{ color: "red" }}>Choose status</span>
                           )
                         }
                       >

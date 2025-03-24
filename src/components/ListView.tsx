@@ -35,8 +35,9 @@ import dayjs, { Dayjs } from "dayjs";
 
 import { useTask } from "../context/TaskContext";
 
-import checkmark from "../assets/checkmark.svg";
-import uncheckmark from "../assets/uncheckmark.svg";
+import todoCheck from "../assets/todoCheck.png";
+import inprogressCheck from "../assets/inprogressCheck.png";
+import completedCheck from "../assets/completedCheck.png";
 import deleteicon from "../assets/delete-icon.svg";
 
 import TaskForm from "./TaskForm";
@@ -302,11 +303,43 @@ const ListView = () => {
             },
           }}
         >
-          <MenuItem onClick={() => handleStatusChange("TODO")}>TODO</MenuItem>
-          <MenuItem onClick={() => handleStatusChange("IN PROGRESS")}>
+          <MenuItem
+            onClick={() => handleStatusChange("TODO")}
+            sx={{
+              transition: "transform 0.2s, font-size 0.5s",
+              "&:hover": {
+                transform: "scale(1.1)",
+                fontSize: "16px",
+                color: "#EA00FF",
+              },
+            }}
+          >
+            TODO
+          </MenuItem>
+          <MenuItem
+            onClick={() => handleStatusChange("IN PROGRESS")}
+            sx={{
+              transition: "transform 0.2s, font-size 0.5s",
+              "&:hover": {
+                transform: "scale(1.1)",
+                fontSize: "16px",
+                color: "#00C6FF",
+              },
+            }}
+          >
             IN PROGRESS
           </MenuItem>
-          <MenuItem onClick={() => handleStatusChange("COMPLETED")}>
+          <MenuItem
+            onClick={() => handleStatusChange("COMPLETED")}
+            sx={{
+              transition: "transform 0.2s, font-size 0.5s",
+              "&:hover": {
+                transform: "scale(1.1)",
+                fontSize: "16px",
+                color: "#0AFF00",
+              },
+            }}
+          >
             COMPLETED
           </MenuItem>
         </Menu>
@@ -317,10 +350,10 @@ const ListView = () => {
   return (
     <Paper
       sx={{
-        padding: { md: 2 },
         marginTop: { xs: 2, md: 0 },
         backgroundColor: "transparent",
         boxShadow: "none",
+        mb: 3,
       }}
     >
       {/* Header */}
@@ -328,14 +361,24 @@ const ListView = () => {
         <Box
           sx={{
             display: "flex",
-            padding: 1,
+            paddingTop: 1,
+            paddingLeft: 1,
+            paddingRight: 1,
           }}
         >
-          <Typography sx={{ width: "50%" }}>Task Name</Typography>
-          <Typography sx={{ width: "20%" }}>Due On</Typography>
-          <Typography sx={{ width: "20%" }}>Task Status</Typography>
-          <Typography sx={{ width: "20%" }}>Task Category</Typography>
-          <Typography sx={{ width: "10%" }}></Typography>
+          <Typography sx={{ width: "50%", fontWeight: "bold" }}>
+            Task Name
+          </Typography>
+          <Typography sx={{ width: "20%", fontWeight: "bold" }}>
+            Due On
+          </Typography>
+          <Typography sx={{ width: "20%", fontWeight: "bold" }}>
+            Task Status
+          </Typography>
+          <Typography sx={{ width: "20%", fontWeight: "bold" }}>
+            Task Category
+          </Typography>
+          <Typography sx={{ width: "10%", fontWeight: "bold" }}></Typography>
         </Box>
       )}
 
@@ -528,6 +571,21 @@ const ListView = () => {
                                         }));
                                         handleClosePopover();
                                       }}
+                                      sx={{
+                                        transition:
+                                          "transform 0.2s, font-size 0.5s",
+                                        "&:hover": {
+                                          backgroundColor: "transparent",
+                                          transform: "scale(1.1)",
+                                          fontSize: "16px",
+                                          color:
+                                            option === "TODO"
+                                              ? "#EA00FF"
+                                              : option === "IN PROGRESS"
+                                              ? "#00C6FF"
+                                              : "#0AFF00",
+                                        },
+                                      }}
                                     >
                                       {option}
                                     </ListItemButton>
@@ -542,6 +600,15 @@ const ListView = () => {
                                         category: option,
                                       }));
                                       handleClosePopover();
+                                    }}
+                                    sx={{
+                                      transition:
+                                        "transform 0.2s, font-size 0.5s",
+                                      "&:hover": {
+                                        backgroundColor: "transparent",
+                                        transform: "scale(1.1)",
+                                        fontSize: "16px",
+                                      },
                                     }}
                                   >
                                     {option}
@@ -648,17 +715,22 @@ const ListView = () => {
 
                               <img
                                 src={
-                                  task.status === "COMPLETED"
-                                    ? checkmark
-                                    : uncheckmark
+                                  task.status == "TODO"
+                                    ? todoCheck
+                                    : task.status === "IN PROGRESS"
+                                    ? inprogressCheck
+                                    : completedCheck
                                 }
                                 alt={
-                                  task.status === "COMPLETED"
-                                    ? "Completed"
-                                    : "Pending"
+                                  task.status === "TOD0"
+                                    ? "todoCheck"
+                                    : task.status === "IN PROGRESS"
+                                    ? "inprogressCheck"
+                                    : "completedCheck"
                                 }
-                                width={24}
-                                height={24}
+                                width={15}
+                                height={15}
+                                style={{ marginRight: "4px" }}
                               />
 
                               {/* Task Title */}
@@ -782,6 +854,13 @@ const ListView = () => {
               display: "flex",
               alignItems: "center",
               gap: 1,
+              color: "#6A5ACD",
+              transition: "transform 0.2s, font-size 0.5s",
+              "&:hover": {
+                transform: "scale(1.1)",
+                fontSize: "16px",
+                backgroundColor: "transparent",
+              },
             }}
           >
             <Box
@@ -811,6 +890,12 @@ const ListView = () => {
               display: "flex",
               alignItems: "center",
               gap: 1,
+              transition: "transform 0.2s, font-size 0.5s",
+              "&:hover": {
+                transform: "scale(1.1)",
+                fontSize: "16px",
+                backgroundColor: "transparent",
+              },
             }}
           >
             <Box
@@ -872,7 +957,7 @@ const ListView = () => {
           <StatusChangePopup onUpdateStatus={batchUpdateStatus} />
 
           <Button
-            variant="outlined"
+            variant="contained"
             color="error"
             onClick={batchDeleteTasks}
             sx={{ fontSize: isSmallScreen ? "12px" : "14px" }}

@@ -103,7 +103,7 @@ const Dashboard = () => {
           justifyContent="space-between"
           spacing={2}
           sx={{
-            backgroundColor: { xs: "#f5f5f5", md: "transparent" },
+            backgroundColor: { xs: "#faeefc", md: "transparent" },
           }}
         >
           {/* left: Icon+name */}
@@ -118,6 +118,7 @@ const Dashboard = () => {
             <Typography
               variant="body1"
               fontSize={{ xs: "18px", md: "28px" }}
+              padding={{ xs: 1 }}
               fontWeight="600"
             >
               TaskBuddy
@@ -130,6 +131,7 @@ const Dashboard = () => {
             alignItems="center"
             justifyContent="space-between"
             spacing={1}
+            sx={{ pr: { xs: 2 } }}
           >
             <Avatar
               src={user?.photoURL || ""}
@@ -172,6 +174,8 @@ const Dashboard = () => {
                     view === "list" ? "2px solid rgb(0, 0, 0)" : "none",
                   borderRadius: 0,
                   pb: 0.5,
+                  transition: "transform 0.2s, font-size 0.5s",
+                  "&:hover": { transform: "scale(1.1)" },
                 }}
               >
                 <img
@@ -194,6 +198,8 @@ const Dashboard = () => {
                     view === "board" ? "2px solid rgb(0, 0, 0)" : "none",
                   borderRadius: 0,
                   pb: 0.5,
+                  transition: "transform 0.2s, font-size 0.5s",
+                  "&:hover": { transform: "scale(1.1)" },
                 }}
               >
                 <img
@@ -226,8 +232,12 @@ const Dashboard = () => {
               variant="contained"
               sx={{
                 bgcolor: "background.default",
-                color: "black",
-                "&:hover": { bgcolor: "#d32f2f" },
+                color: "#d32f2f",
+                transition: "transform 0.1s",
+                "&:hover": {
+                  color: "#d32f2f",
+                  transform: "scale(1.1)",
+                },
               }}
               onClick={logout}
               startIcon={
@@ -238,7 +248,7 @@ const Dashboard = () => {
                 />
               }
             >
-              Logout
+              <Typography variant="body1">Logout</Typography>
             </Button>
           </Stack>
         </Stack>
@@ -409,8 +419,13 @@ const Dashboard = () => {
 
               <Button
                 variant="contained"
-                sx={{ minWidth: "150px", height: "60px" }}
                 onClick={handleAddTask}
+                sx={{
+                  minWidth: "150px",
+                  height: "60px",
+                  transition: "transform 0.2s, font-size 0.5s",
+                  "&:hover": { transform: "scale(1.1)" },
+                }}
               >
                 <Typography variant="body1" fontSize="18px">
                   ADD TASK

@@ -87,7 +87,7 @@ const BoardView = () => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Box display="flex" justifyContent="space-between" gap={2} mt={3}>
+      <Box display="flex" justifyContent="space-between" gap={2} my={3}>
         {columns.map((column) => (
           <Droppable key={column.title} droppableId={column.title}>
             {(provided) => (
@@ -235,12 +235,26 @@ const BoardView = () => {
                     anchorEl={menuAnchor}
                     open={Boolean(menuAnchor)}
                     onClose={handleMenuClose}
+                    sx={{
+                      "& .MuiPaper-root": {
+                        backgroundColor: "#fff9f9",
+                        borderRadius: "15px",
+                      },
+                    }}
                   >
                     <MenuItem
                       sx={{
                         display: "flex",
                         alignItems: "center",
                         gap: 1,
+                        color: "#6A5ACD",
+                        transition: "transform 0.2s, font-size 0.5s",
+                        "&:hover": {
+                          transform: "scale(1.1)",
+                          color: "blue",
+                          fontSize: "16px",
+                          backgroundColor: "transparent",
+                        },
                       }}
                     >
                       <Box
@@ -270,6 +284,12 @@ const BoardView = () => {
                         display: "flex",
                         alignItems: "center",
                         gap: 1,
+                        transition: "transform 0.2s, font-size 0.5s",
+                        "&:hover": {
+                          transform: "scale(1.1)",
+                          fontSize: "16px",
+                          backgroundColor: "transparent",
+                        },
                       }}
                     >
                       <Box
