@@ -56,6 +56,7 @@ const Dashboard = () => {
     setFilterDate,
     searchQuery,
     setSearchQuery,
+    // setIsSearching,
   } = useTask();
 
   const handleAddTask = () => {
@@ -77,6 +78,7 @@ const Dashboard = () => {
 
   const handleSearch = (event: ChangeEvent<HTMLInputElement>): void => {
     setSearchQuery(event.target.value as string);
+    // setIsSearching(!!event.target.value);
   };
 
   return (

@@ -67,4 +67,6 @@ export interface TaskContextType {
   setFilterDate: (date: Dayjs | null) => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  isSearching: boolean;
+  setIsSearching: (value: boolean) => void;
 }

@@ -20,6 +20,7 @@ import {
 import { useTask } from "../context/TaskContext";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import deleteicon from "../assets/delete-icon.svg";
+import SearchNotFound from "../assets/SearchNotFound.svg";
 
 import { Task } from "../types/types";
 
@@ -34,6 +35,7 @@ const BoardView = () => {
     setCurrentTask,
     setOpenForm,
     updateTask,
+    isSearching,
   } = useTask();
 
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
@@ -85,7 +87,27 @@ const BoardView = () => {
     }
   };
 
-  return (
+  return isSearching && displayTasks.length === 0 ? (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "50vh",
+        textAlign: "center",
+      }}
+    >
+      <img
+        src={SearchNotFound}
+        alt="No search results"
+        style={{ width: "200px", height: "auto", marginBottom: "16px" }}
+      />
+      <Typography variant="h6" color="textSecondary">
+        It looks like we can't find any results <br /> that match.
+      </Typography>
+    </Box>
+  ) : (
     <DragDropContext onDragEnd={onDragEnd}>
       <Box display="flex" justifyContent="space-between" gap={2} my={3}>
         {columns.map((column) => (

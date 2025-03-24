@@ -42,6 +42,14 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
 
+  const [isSearching, setIsSearching] = useState(false);
+  // const isSearchingRef = useRef(false);
+
+  // // Update when search query changes
+  // useEffect(() => {
+  //   isSearchingRef.current = searchQuery !== "";
+  // }, [searchQuery]);
+
   // Fetch Tasks from Firestore when User Logs In & using Firestore Listener
   useEffect(() => {
     if (!userId) return;
@@ -69,6 +77,8 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
+      // isSearchingRef.current = searchQuery !== "";
+      setIsSearching(searchQuery !== "");
     }, 500); // Adjust debounce delay as needed
 
     return () => clearTimeout(handler);
@@ -218,6 +228,8 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
         setSearchQuery,
         updateMultipleTasksStatus,
         deleteMultipleTasks,
+        isSearching,
+        setIsSearching,
       }}
     >
       {children}

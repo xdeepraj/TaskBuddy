@@ -35,6 +35,7 @@ import dayjs, { Dayjs } from "dayjs";
 
 import { useTask } from "../context/TaskContext";
 
+import SearchNotFound from "../assets/SearchNotFound.svg";
 import todoCheck from "../assets/todoCheck.png";
 import inprogressCheck from "../assets/inprogressCheck.png";
 import completedCheck from "../assets/completedCheck.png";
@@ -73,6 +74,7 @@ const ListView = () => {
     setOpenForm,
     updateMultipleTasksStatus,
     deleteMultipleTasks,
+    isSearching,
   } = useTask();
 
   // Determine which array to display based on filters
@@ -382,192 +384,250 @@ const ListView = () => {
         </Box>
       )}
 
+      {!isSmallScreen && (
+        <Divider sx={{ borderColor: "#d9d9d9", width: "100%", my: 2 }} />
+      )}
+
       {/* Dynamically Render Task Accordions */}
-      <DragDropContext onDragEnd={onDragEnd}>
-        {/* </DragDropContext> */}
-        {taskAccordions.map((taskAccordion, index) => (
-          <Droppable
-            droppableId={taskAccordion.title.split(" (")[0]}
-            key={taskAccordion.title}
-          >
-            {(provided) => (
-              <Accordion
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                key={index}
-                defaultExpanded
-                sx={{
-                  borderRadius: "10px 10px 10px 10px",
-                  overflow: "hidden",
-                  "&:last-of-type": {
+      {isSearching && displayTasks.length === 0 ? (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "50vh",
+            textAlign: "center",
+          }}
+        >
+          <img
+            src={SearchNotFound}
+            alt="No search results"
+            style={{ width: "200px", height: "auto", marginBottom: "16px" }}
+          />
+          <Typography variant="h6" color="textSecondary">
+            It looks like we can't find any results <br /> that match.
+          </Typography>
+        </Box>
+      ) : (
+        <DragDropContext onDragEnd={onDragEnd}>
+          {/* </DragDropContext> */}
+          {taskAccordions.map((taskAccordion, index) => (
+            <Droppable
+              droppableId={taskAccordion.title.split(" (")[0]}
+              key={taskAccordion.title}
+            >
+              {(provided) => (
+                <Accordion
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  key={index}
+                  defaultExpanded
+                  sx={{
                     borderRadius: "10px 10px 10px 10px",
-                  },
-                  mb: 3,
-                }}
-              >
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  sx={{
-                    backgroundColor: taskAccordion.bgColor,
-                  }}
-                >
-                  <Typography variant="h6">{taskAccordion.title}</Typography>
-                </AccordionSummary>
-                <AccordionDetails
-                  sx={{
-                    backgroundColor: "#f1f1f1",
                     overflow: "hidden",
-                    p: 0,
+                    "&:last-of-type": {
+                      borderRadius: "10px 10px 10px 10px",
+                    },
+                    mb: 3,
                   }}
                 >
-                  {/* Show "Add Task" button if the showAddButton is true */}
-                  {!isSmallScreen && taskAccordion.showAddButton && (
-                    <>
-                      <Button
-                        variant="text"
-                        color="primary"
-                        sx={{ pl: 3, py: 2 }}
-                        startIcon={<AddIcon />}
-                        onClick={() => setShowAddTask(true)}
-                      >
-                        ADD TASK
-                      </Button>
-                      <Divider
-                        sx={{ borderColor: "#d9d9d9", width: "100%", my: 1 }}
-                      />
-                    </>
-                  )}
-
-                  {/* Show input fields when "Add Task" is clicked */}
-                  {taskAccordion.showAddButton && showAddTask && (
-                    <>
-                      <Box
-                        sx={{
-                          display: "grid",
-                          gridTemplateColumns: "2fr 1fr 1fr 1fr",
-                          gap: 2,
-                          padding: 1,
-                          alignItems: "center",
-                        }}
-                      >
-                        {/* Task Title */}
-                        <TextField
-                          label="Task Title"
-                          value={newTask.title}
-                          onChange={(e) =>
-                            setNewTask((prev) => ({
-                              ...prev,
-                              title: e.target.value,
-                            }))
-                          }
-                          variant="standard"
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    sx={{
+                      backgroundColor: taskAccordion.bgColor,
+                    }}
+                  >
+                    <Typography variant="h6">{taskAccordion.title}</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails
+                    sx={{
+                      backgroundColor: "#f1f1f1",
+                      overflow: "hidden",
+                      p: 0,
+                    }}
+                  >
+                    {/* Show "Add Task" button if the showAddButton is true */}
+                    {!isSmallScreen && taskAccordion.showAddButton && (
+                      <>
+                        <Button
+                          variant="text"
+                          color="primary"
+                          sx={{ pl: 3, py: 2 }}
+                          startIcon={<AddIcon />}
+                          onClick={() => setShowAddTask(true)}
+                        >
+                          ADD TASK
+                        </Button>
+                        <Divider
+                          sx={{ borderColor: "#d9d9d9", width: "100%", my: 1 }}
                         />
+                      </>
+                    )}
 
-                        {/* Due Date */}
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                          <DatePicker
-                            disablePast
-                            value={newTask.dueDate}
-                            onChange={(date) =>
-                              setNewTask((prev) => ({ ...prev, dueDate: date }))
+                    {/* Show input fields when "Add Task" is clicked */}
+                    {taskAccordion.showAddButton && showAddTask && (
+                      <>
+                        <Box
+                          sx={{
+                            display: "grid",
+                            gridTemplateColumns: "2fr 1fr 1fr 1fr",
+                            gap: 2,
+                            padding: 1,
+                            alignItems: "center",
+                          }}
+                        >
+                          {/* Task Title */}
+                          <TextField
+                            label="Task Title"
+                            value={newTask.title}
+                            onChange={(e) =>
+                              setNewTask((prev) => ({
+                                ...prev,
+                                title: e.target.value,
+                              }))
                             }
-                            slots={{
-                              textField: (params) => (
-                                <TextField
-                                  {...params}
-                                  size="small"
-                                  sx={{
-                                    backgroundColor: "#f1f1f1",
-                                    width: "90%",
-                                  }}
-                                />
-                              ),
-                            }}
+                            variant="standard"
                           />
-                        </LocalizationProvider>
 
-                        {/* Status Popover */}
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "flex-start",
-                            alignItems: "center",
-                          }}
-                        >
-                          <IconButton
-                            onClick={(e) => handleOpenPopover(e, "status")}
-                          >
-                            <AddIcon />
-                          </IconButton>
-                          {newTask.status && (
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                backgroundColor: "#dddadd",
-                                px: 1,
-                                py: 0.5,
-                                borderRadius: "10px",
+                          {/* Due Date */}
+                          <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                              disablePast
+                              value={newTask.dueDate}
+                              onChange={(date) =>
+                                setNewTask((prev) => ({
+                                  ...prev,
+                                  dueDate: date,
+                                }))
+                              }
+                              slots={{
+                                textField: (params) => (
+                                  <TextField
+                                    {...params}
+                                    size="small"
+                                    sx={{
+                                      backgroundColor: "#f1f1f1",
+                                      width: "90%",
+                                    }}
+                                  />
+                                ),
                               }}
-                            >
-                              {newTask.status}
-                            </Typography>
-                          )}
-                        </Box>
+                            />
+                          </LocalizationProvider>
 
-                        {/* Category Popover */}
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "flex-start",
-                            alignItems: "center",
-                          }}
-                        >
-                          <IconButton
-                            onClick={(e) => handleOpenPopover(e, "category")}
+                          {/* Status Popover */}
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "flex-start",
+                              alignItems: "center",
+                            }}
                           >
-                            <AddIcon />
-                          </IconButton>
-                          {newTask.category && (
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                backgroundColor: "#dddadd",
-                                px: 1,
-                                py: 0.5,
-                                borderRadius: "10px",
-                                fontSize: "15px",
-                              }}
+                            <IconButton
+                              onClick={(e) => handleOpenPopover(e, "status")}
                             >
-                              {newTask.category}
-                            </Typography>
-                          )}
-                        </Box>
+                              <AddIcon />
+                            </IconButton>
+                            {newTask.status && (
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  backgroundColor: "#dddadd",
+                                  px: 1,
+                                  py: 0.5,
+                                  borderRadius: "10px",
+                                }}
+                              >
+                                {newTask.status}
+                              </Typography>
+                            )}
+                          </Box>
 
-                        <Popover
-                          open={Boolean(anchorEl)}
-                          anchorEl={anchorEl}
-                          onClose={handleClosePopover}
-                          anchorOrigin={{
-                            vertical: "bottom",
-                            horizontal: "left",
-                          }}
-                          sx={{
-                            "& .MuiPaper-root": {
-                              backgroundColor: "#fff9f9",
-                              borderRadius: "15px",
-                            },
-                          }}
-                        >
-                          <List>
-                            {popoverType === "status"
-                              ? ["TODO", "IN PROGRESS", "COMPLETED"].map(
-                                  (option) => (
+                          {/* Category Popover */}
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "flex-start",
+                              alignItems: "center",
+                            }}
+                          >
+                            <IconButton
+                              onClick={(e) => handleOpenPopover(e, "category")}
+                            >
+                              <AddIcon />
+                            </IconButton>
+                            {newTask.category && (
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  backgroundColor: "#dddadd",
+                                  px: 1,
+                                  py: 0.5,
+                                  borderRadius: "10px",
+                                  fontSize: "15px",
+                                }}
+                              >
+                                {newTask.category}
+                              </Typography>
+                            )}
+                          </Box>
+
+                          <Popover
+                            open={Boolean(anchorEl)}
+                            anchorEl={anchorEl}
+                            onClose={handleClosePopover}
+                            anchorOrigin={{
+                              vertical: "bottom",
+                              horizontal: "left",
+                            }}
+                            sx={{
+                              "& .MuiPaper-root": {
+                                backgroundColor: "#fff9f9",
+                                borderRadius: "15px",
+                              },
+                            }}
+                          >
+                            <List>
+                              {popoverType === "status"
+                                ? ["TODO", "IN PROGRESS", "COMPLETED"].map(
+                                    (option) => (
+                                      <ListItemButton
+                                        key={option}
+                                        onClick={() => {
+                                          setNewTask((prev) => ({
+                                            ...prev,
+                                            status: option,
+                                          }));
+                                          handleClosePopover();
+                                        }}
+                                        sx={{
+                                          transition:
+                                            "transform 0.2s, font-size 0.5s",
+                                          "&:hover": {
+                                            backgroundColor: "transparent",
+                                            transform: "scale(1.1)",
+                                            fontSize: "16px",
+                                            color:
+                                              option === "TODO"
+                                                ? "#EA00FF"
+                                                : option === "IN PROGRESS"
+                                                ? "#00C6FF"
+                                                : "#0AFF00",
+                                          },
+                                        }}
+                                      >
+                                        {option}
+                                      </ListItemButton>
+                                    )
+                                  )
+                                : ["Work", "Personal"].map((option) => (
                                     <ListItemButton
                                       key={option}
                                       onClick={() => {
                                         setNewTask((prev) => ({
                                           ...prev,
-                                          status: option,
+                                          category: option,
                                         }));
                                         handleClosePopover();
                                       }}
@@ -578,260 +638,232 @@ const ListView = () => {
                                           backgroundColor: "transparent",
                                           transform: "scale(1.1)",
                                           fontSize: "16px",
-                                          color:
-                                            option === "TODO"
-                                              ? "#EA00FF"
-                                              : option === "IN PROGRESS"
-                                              ? "#00C6FF"
-                                              : "#0AFF00",
                                         },
                                       }}
                                     >
                                       {option}
                                     </ListItemButton>
-                                  )
-                                )
-                              : ["Work", "Personal"].map((option) => (
-                                  <ListItemButton
-                                    key={option}
-                                    onClick={() => {
-                                      setNewTask((prev) => ({
-                                        ...prev,
-                                        category: option,
-                                      }));
-                                      handleClosePopover();
-                                    }}
-                                    sx={{
-                                      transition:
-                                        "transform 0.2s, font-size 0.5s",
-                                      "&:hover": {
-                                        backgroundColor: "transparent",
-                                        transform: "scale(1.1)",
-                                        fontSize: "16px",
-                                      },
-                                    }}
-                                  >
-                                    {option}
-                                  </ListItemButton>
-                                ))}
-                          </List>
-                        </Popover>
-                      </Box>
+                                  ))}
+                            </List>
+                          </Popover>
+                        </Box>
 
-                      <Stack
-                        direction="row"
-                        alignItems="center"
-                        justifyContent="center"
-                        sx={{ mt: 2, mb: 0.5 }}
-                      >
-                        {missingFields.length > 0 && (
-                          <Typography
-                            variant="caption"
-                            color="error"
-                            sx={{ alignSelf: "flex-end" }}
-                          >
-                            **PLEASE PROVIDE: {missingFields.join(", ")}.
-                          </Typography>
-                        )}
-                      </Stack>
-
-                      {/* Add & Cancel Buttons */}
-                      <Stack
-                        direction="row"
-                        spacing={2}
-                        justifyContent="center"
-                        sx={{ mb: 2 }}
-                      >
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={handleAddTask}
-                          endIcon={<SubdirectoryArrowLeftIcon />}
-                          disabled={
-                            !newTask.title ||
-                            !newTask.dueDate ||
-                            !newTask.status ||
-                            !newTask.category
-                          }
+                        <Stack
+                          direction="row"
+                          alignItems="center"
+                          justifyContent="center"
+                          sx={{ mt: 2, mb: 0.5 }}
                         >
-                          ADD
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          color="secondary"
-                          onClick={handleCancel}
+                          {missingFields.length > 0 && (
+                            <Typography
+                              variant="caption"
+                              color="error"
+                              sx={{ alignSelf: "flex-end" }}
+                            >
+                              **PLEASE PROVIDE: {missingFields.join(", ")}.
+                            </Typography>
+                          )}
+                        </Stack>
+
+                        {/* Add & Cancel Buttons */}
+                        <Stack
+                          direction="row"
+                          spacing={2}
+                          justifyContent="center"
+                          sx={{ mb: 2 }}
                         >
-                          CANCEL
-                        </Button>
-                      </Stack>
-
-                      <Divider
-                        sx={{ borderColor: "#d9d9d9", width: "100%", my: 2 }}
-                      />
-                    </>
-                  )}
-
-                  {taskAccordion.taskList.length > 0 ? (
-                    taskAccordion.taskList.map((task: Task, idx: number) => (
-                      <Draggable
-                        key={task.id}
-                        draggableId={task.id ?? "unknown-id"}
-                        index={idx}
-                      >
-                        {(provided) => (
-                          <Box
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            sx={{
-                              display: "grid",
-                              gridTemplateColumns: {
-                                xs: "1fr auto",
-                                md: "5fr 2fr 2fr 2fr 1fr",
-                              },
-                              gap: 2,
-                              padding: 1,
-                              alignItems: "center",
-                              backgroundColor: "#f1f1f1",
-                              boxShadow: "2px 2px 5px rgba(0,0,0,0.1)",
-                              borderRadius: "4px",
-                            }}
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleAddTask}
+                            endIcon={<SubdirectoryArrowLeftIcon />}
+                            disabled={
+                              !newTask.title ||
+                              !newTask.dueDate ||
+                              !newTask.status ||
+                              !newTask.category
+                            }
                           >
-                            {/* Checkbox + drag indicator + check/uncheck + Title */}
+                            ADD
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            color="secondary"
+                            onClick={handleCancel}
+                          >
+                            CANCEL
+                          </Button>
+                        </Stack>
+
+                        <Divider
+                          sx={{ borderColor: "#d9d9d9", width: "100%", my: 2 }}
+                        />
+                      </>
+                    )}
+
+                    {taskAccordion.taskList.length > 0 ? (
+                      taskAccordion.taskList.map((task: Task, idx: number) => (
+                        <Draggable
+                          key={task.id}
+                          draggableId={task.id ?? "unknown-id"}
+                          index={idx}
+                        >
+                          {(provided) => (
                             <Box
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
                               sx={{
-                                display: "flex",
+                                display: "grid",
+                                gridTemplateColumns: {
+                                  xs: "1fr auto",
+                                  md: "5fr 2fr 2fr 2fr 1fr",
+                                },
+                                gap: 2,
+                                padding: 1,
                                 alignItems: "center",
+                                backgroundColor: "#f1f1f1",
+                                boxShadow: "2px 2px 5px rgba(0,0,0,0.1)",
+                                borderRadius: "4px",
                               }}
                             >
-                              <Checkbox
-                                checked={batchTasks.some(
-                                  (selectedTask) => selectedTask.id === task.id
-                                )}
-                                onChange={() => handleCheckboxChange(task)}
-                              />
-
-                              {!isSmallScreen && <DragIndicatorIcon />}
-
-                              <img
-                                src={
-                                  task.status == "TODO"
-                                    ? todoCheck
-                                    : task.status === "IN PROGRESS"
-                                    ? inprogressCheck
-                                    : completedCheck
-                                }
-                                alt={
-                                  task.status === "TOD0"
-                                    ? "todoCheck"
-                                    : task.status === "IN PROGRESS"
-                                    ? "inprogressCheck"
-                                    : "completedCheck"
-                                }
-                                width={15}
-                                height={15}
-                                style={{ marginRight: "4px" }}
-                              />
-
-                              {/* Task Title */}
-                              <Typography
-                                variant="body1"
+                              {/* Checkbox + drag indicator + check/uncheck + Title */}
+                              <Box
                                 sx={{
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  whiteSpace: "normal",
-                                  wordBreak: "break-word",
-                                  textDecoration:
-                                    task.status === "COMPLETED"
-                                      ? "line-through"
-                                      : "none",
+                                  display: "flex",
+                                  alignItems: "center",
                                 }}
                               >
-                                {task.title}
-                              </Typography>
-                            </Box>
+                                <Checkbox
+                                  checked={batchTasks.some(
+                                    (selectedTask) =>
+                                      selectedTask.id === task.id
+                                  )}
+                                  onChange={() => handleCheckboxChange(task)}
+                                />
 
-                            {/* Due Date */}
-                            {!isSmallScreen && (
-                              <Box>
-                                <Typography variant="body1">
-                                  {task.dueDate
-                                    ? dayjs(task.dueDate.toDate()).format(
-                                        "DD MMM, YYYY"
-                                      )
-                                    : "No due date"}
-                                </Typography>
-                              </Box>
-                            )}
+                                {!isSmallScreen && <DragIndicatorIcon />}
 
-                            {/* Task Status */}
-                            {!isSmallScreen && (
-                              <Box
-                                sx={{ display: "flex", alignItems: "center" }}
-                              >
+                                <img
+                                  src={
+                                    task.status == "TODO"
+                                      ? todoCheck
+                                      : task.status === "IN PROGRESS"
+                                      ? inprogressCheck
+                                      : completedCheck
+                                  }
+                                  alt={
+                                    task.status === "TOD0"
+                                      ? "todoCheck"
+                                      : task.status === "IN PROGRESS"
+                                      ? "inprogressCheck"
+                                      : "completedCheck"
+                                  }
+                                  width={15}
+                                  height={15}
+                                  style={{ marginRight: "4px" }}
+                                />
+
+                                {/* Task Title */}
                                 <Typography
                                   variant="body1"
                                   sx={{
-                                    backgroundColor: "#dddadd",
-                                    px: 1,
-                                    py: 0.5,
-                                    borderRadius: "4px",
-                                    fontSize: "15px",
-                                    display: "inline-block",
-                                    width: "fit-content",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "normal",
+                                    wordBreak: "break-word",
+                                    textDecoration:
+                                      task.status === "COMPLETED"
+                                        ? "line-through"
+                                        : "none",
                                   }}
                                 >
-                                  {task.status}
+                                  {task.title}
                                 </Typography>
                               </Box>
-                            )}
 
-                            {/* Category */}
-                            {!isSmallScreen && (
-                              <Box>
-                                <Typography variant="body1">
-                                  {task.category}
-                                </Typography>
+                              {/* Due Date */}
+                              {!isSmallScreen && (
+                                <Box>
+                                  <Typography variant="body1">
+                                    {task.dueDate
+                                      ? dayjs(task.dueDate.toDate()).format(
+                                          "DD MMM, YYYY"
+                                        )
+                                      : "No due date"}
+                                  </Typography>
+                                </Box>
+                              )}
+
+                              {/* Task Status */}
+                              {!isSmallScreen && (
+                                <Box
+                                  sx={{ display: "flex", alignItems: "center" }}
+                                >
+                                  <Typography
+                                    variant="body1"
+                                    sx={{
+                                      backgroundColor: "#dddadd",
+                                      px: 1,
+                                      py: 0.5,
+                                      borderRadius: "4px",
+                                      fontSize: "15px",
+                                      display: "inline-block",
+                                      width: "fit-content",
+                                    }}
+                                  >
+                                    {task.status}
+                                  </Typography>
+                                </Box>
+                              )}
+
+                              {/* Category */}
+                              {!isSmallScreen && (
+                                <Box>
+                                  <Typography variant="body1">
+                                    {task.category}
+                                  </Typography>
+                                </Box>
+                              )}
+
+                              {/* Actions */}
+                              <Box sx={{ ml: { xs: "auto", md: 0 } }}>
+                                <IconButton
+                                  onClick={(e) => handleMenuOpen(e, task)}
+                                >
+                                  <MoreHorizIcon />
+                                </IconButton>
                               </Box>
-                            )}
-
-                            {/* Actions */}
-                            <Box sx={{ ml: { xs: "auto", md: 0 } }}>
-                              <IconButton
-                                onClick={(e) => handleMenuOpen(e, task)}
-                              >
-                                <MoreHorizIcon />
-                              </IconButton>
                             </Box>
-                          </Box>
-                        )}
-                      </Draggable>
-                    ))
-                  ) : (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "100px",
-                      }}
-                    >
-                      <Typography>
-                        No Tasks in{" "}
-                        {taskAccordion.title.slice(
-                          0,
-                          taskAccordion.title.lastIndexOf(" ")
-                        )}
-                      </Typography>
-                    </Box>
-                  )}
-                  {provided.placeholder}
-                </AccordionDetails>
-              </Accordion>
-            )}
-          </Droppable>
-        ))}
-      </DragDropContext>
+                          )}
+                        </Draggable>
+                      ))
+                    ) : (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          height: "100px",
+                        }}
+                      >
+                        <Typography>
+                          No Tasks in{" "}
+                          {taskAccordion.title.slice(
+                            0,
+                            taskAccordion.title.lastIndexOf(" ")
+                          )}
+                        </Typography>
+                      </Box>
+                    )}
+                    {provided.placeholder}
+                  </AccordionDetails>
+                </Accordion>
+              )}
+            </Droppable>
+          ))}
+        </DragDropContext>
+      )}
 
       {/* Render Task Form for Adding a New Task */}
       <TaskForm />
