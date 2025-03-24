@@ -1,5 +1,4 @@
 import { useState, ChangeEvent } from "react";
-
 import {
   Button,
   Typography,
@@ -9,6 +8,8 @@ import {
   Divider,
   useMediaQuery,
   useTheme,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import InputLabel from "@mui/material/InputLabel";
@@ -22,6 +23,8 @@ import BWIcon from "../assets/bw-icon.svg";
 import ListIcon from "../assets/list-icon.svg";
 import BoardIcon from "../assets/board-icon.svg";
 import LogoutIcon from "../assets/logout-icon.svg";
+import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
 
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -376,11 +379,32 @@ const Dashboard = () => {
           {!isSmallScreen && (
             <Stack direction="row" alignItems="center" spacing={2}>
               <TextField
+                placeholder="Search"
                 label="Search"
                 variant="outlined"
-                fullWidth
                 value={searchQuery}
                 onChange={handleSearch}
+                sx={{ minWidth: "300px" }}
+                slotProps={{
+                  inputLabel: { shrink: true },
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                    endAdornment: searchQuery && (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setSearchQuery("")}
+                          edge="end"
+                        >
+                          <ClearIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
               />
 
               <Button
@@ -396,14 +420,32 @@ const Dashboard = () => {
           )}
         </Stack>
 
+        {/* Search only for mobile */}
         {isSmallScreen && (
           <Stack direction="row" mt={filterDate ? 6 : 4}>
             <TextField
+              placeholder="Search"
               label="Search"
               variant="outlined"
               fullWidth
               value={searchQuery}
               onChange={handleSearch}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                  endAdornment: searchQuery && (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setSearchQuery("")} edge="end">
+                        <ClearIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
           </Stack>
         )}

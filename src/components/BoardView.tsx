@@ -105,6 +105,7 @@ const BoardView = () => {
                   borderRadius: "12px",
                 }}
               >
+                {/* Column name */}
                 <Box
                   sx={{
                     backgroundColor: column.color,
@@ -120,95 +121,111 @@ const BoardView = () => {
                 </Box>
 
                 <Box flex={1} display="flex" flexDirection="column" gap={1}>
-                  {displayTasks
-                    .filter((task) => task.status === column.title)
-                    .map((task, index) => (
-                      <Draggable
-                        key={task.id}
-                        draggableId={task.id!}
-                        index={index}
-                      >
-                        {(provided) => (
-                          <Card
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            sx={{
-                              minHeight: 150,
-                              marginBottom: 1,
-                              cursor: "pointer",
-                              borderRadius: "12px",
-                              display: "flex",
-                              flexDirection: "column",
-                              "&:hover": { boxShadow: 4 },
-                            }}
-                            onClick={() => {
-                              setCurrentTask(task);
-                              setOpenForm(true);
-                            }}
-                          >
-                            <CardContent
+                  {displayTasks.filter((task) => task.status === column.title)
+                    .length === 0 ? (
+                    <Typography
+                      variant="body2"
+                      color="textSecondary"
+                      sx={{
+                        textAlign: "center",
+                        mt: 2,
+                        fontSize: 16,
+                        color: "black",
+                      }}
+                    >
+                      No Tasks in {column.title}
+                    </Typography>
+                  ) : (
+                    displayTasks
+                      .filter((task) => task.status === column.title)
+                      .map((task, index) => (
+                        <Draggable
+                          key={task.id}
+                          draggableId={task.id!}
+                          index={index}
+                        >
+                          {(provided) => (
+                            <Card
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
                               sx={{
+                                minHeight: 150,
+                                marginBottom: 1,
+                                cursor: "pointer",
+                                borderRadius: "12px",
                                 display: "flex",
                                 flexDirection: "column",
-                                height: "100%",
+                                "&:hover": { boxShadow: 4 },
+                              }}
+                              onClick={() => {
+                                setCurrentTask(task);
+                                setOpenForm(true);
                               }}
                             >
-                              <Box
-                                display="flex"
-                                justifyContent="space-between"
-                                alignItems="center"
+                              <CardContent
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  height: "100%",
+                                }}
                               >
-                                <Typography
-                                  variant="h6"
-                                  sx={{
-                                    textDecoration:
-                                      task.status === "COMPLETED"
-                                        ? "line-through"
-                                        : "none",
-                                  }}
+                                <Box
+                                  display="flex"
+                                  justifyContent="space-between"
+                                  alignItems="center"
                                 >
-                                  {task.title}
-                                </Typography>
-                                <IconButton
-                                  size="small"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleMenuOpen(e, task);
-                                  }}
-                                >
-                                  <MoreHorizIcon />
-                                </IconButton>
-                              </Box>
+                                  <Typography
+                                    variant="h6"
+                                    sx={{
+                                      textDecoration:
+                                        task.status === "COMPLETED"
+                                          ? "line-through"
+                                          : "none",
+                                    }}
+                                  >
+                                    {task.title}
+                                  </Typography>
+                                  <IconButton
+                                    size="small"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleMenuOpen(e, task);
+                                    }}
+                                  >
+                                    <MoreHorizIcon />
+                                  </IconButton>
+                                </Box>
 
-                              <Box
-                                display="flex"
-                                justifyContent="space-between"
-                                alignItems="center"
-                                marginTop="auto"
-                              >
-                                <Typography
-                                  variant="body2"
-                                  color="textSecondary"
+                                <Box
+                                  display="flex"
+                                  justifyContent="space-between"
+                                  alignItems="center"
+                                  marginTop="auto"
                                 >
-                                  {task.category}
-                                </Typography>
-                                <Typography
-                                  variant="body2"
-                                  color="textSecondary"
-                                >
-                                  {task.dueDate
-                                    ? dayjs(task.dueDate.toDate()).format(
-                                        "DD MMM, YYYY"
-                                      )
-                                    : "No due date"}
-                                </Typography>
-                              </Box>
-                            </CardContent>
-                          </Card>
-                        )}
-                      </Draggable>
-                    ))}
+                                  <Typography
+                                    variant="body2"
+                                    color="textSecondary"
+                                  >
+                                    {task.category}
+                                  </Typography>
+                                  <Typography
+                                    variant="body2"
+                                    color="textSecondary"
+                                  >
+                                    {task.dueDate
+                                      ? dayjs(task.dueDate.toDate()).format(
+                                          "DD MMM, YYYY"
+                                        )
+                                      : "No due date"}
+                                  </Typography>
+                                </Box>
+                              </CardContent>
+                            </Card>
+                          )}
+                        </Draggable>
+                      ))
+                  )}
                   {provided.placeholder}
                 </Box>
 

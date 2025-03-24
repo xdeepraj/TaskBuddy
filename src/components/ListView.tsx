@@ -234,11 +234,6 @@ const ListView = () => {
   };
 
   const batchUpdateStatus = async (newStatus: any) => {
-    // console.log("from batchUpdateStatus: ");
-    // console.log("batchTasks: ", batchTasks);
-    // console.log("newStatus: ", newStatus);
-    // create log for every task
-    // Ensure all logging operations complete before updating status
     await Promise.all(
       batchTasks.map((task) =>
         logActivity(
@@ -290,6 +285,22 @@ const ListView = () => {
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           onClose={handleClose}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+          transformOrigin={{
+            vertical: "bottom",
+            horizontal: "center",
+          }}
+          sx={{
+            mt: -1.5,
+            "& .MuiPaper-root": {
+              backgroundColor: "black",
+              color: "white",
+              borderRadius: "15px",
+            },
+          }}
         >
           <MenuItem onClick={() => handleStatusChange("TODO")}>TODO</MenuItem>
           <MenuItem onClick={() => handleStatusChange("IN PROGRESS")}>
@@ -452,7 +463,7 @@ const ListView = () => {
                                 backgroundColor: "#dddadd",
                                 px: 1,
                                 py: 0.5,
-                                borderRadius: "4px",
+                                borderRadius: "10px",
                               }}
                             >
                               {newTask.status}
@@ -480,7 +491,7 @@ const ListView = () => {
                                 backgroundColor: "#dddadd",
                                 px: 1,
                                 py: 0.5,
-                                borderRadius: "4px",
+                                borderRadius: "10px",
                                 fontSize: "15px",
                               }}
                             >
@@ -496,6 +507,12 @@ const ListView = () => {
                           anchorOrigin={{
                             vertical: "bottom",
                             horizontal: "left",
+                          }}
+                          sx={{
+                            "& .MuiPaper-root": {
+                              backgroundColor: "#fff9f9",
+                              borderRadius: "15px",
+                            },
                           }}
                         >
                           <List>
@@ -753,6 +770,12 @@ const ListView = () => {
           anchorEl={menuAnchor}
           open={Boolean(menuAnchor)}
           onClose={handleMenuClose}
+          sx={{
+            "& .MuiPaper-root": {
+              backgroundColor: "#fff9f9",
+              borderRadius: "15px",
+            },
+          }}
         >
           <MenuItem
             sx={{
