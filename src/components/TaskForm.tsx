@@ -369,7 +369,7 @@ const TaskForm: React.FC = () => {
 
       <Divider />
       <DialogContent>
-        {isSmallScreen && (
+        {isSmallScreen && currentTask && (
           <Stack
             direction="row"
             gap={2}
@@ -663,7 +663,7 @@ const TaskForm: React.FC = () => {
                   flex: 2,
                   backgroundColor: "#f9f9f9",
                   borderRadius: 2,
-                  height: "100%",
+                  minHeight: "665px",
                   border: "1px solid #ddd",
                 }}
               >
@@ -1111,37 +1111,41 @@ const TaskForm: React.FC = () => {
         )}
       </DialogContent>
 
-      <DialogActions
-        sx={{ flexDirection: "column", alignItems: "stretch", gap: 1 }}
-      >
-        {/* First row: Floating error message aligned to the right */}
-        {isCreateDisabled && (
-          <Typography
-            variant="caption"
-            color="error"
-            sx={{
-              alignSelf: { xs: "center", md: "flex-end" },
-              textAlign: { xs: "center", md: "right" },
-            }}
-          >
-            {`**PLEASE PROVIDE: ${missingFields.join(", ")} to create a task.`}
-          </Typography>
-        )}
+      {(!isSmallScreen || activeTab !== "Activity") && (
+        <DialogActions
+          sx={{ flexDirection: "column", alignItems: "stretch", gap: 1 }}
+        >
+          {/* First row: Floating error message aligned to the right */}
+          {isCreateDisabled && (
+            <Typography
+              variant="caption"
+              color="error"
+              sx={{
+                alignSelf: { xs: "center", md: "flex-end" },
+                textAlign: { xs: "center", md: "right" },
+              }}
+            >
+              {`**PLEASE PROVIDE: ${missingFields.join(
+                ", "
+              )} to create a task.`}
+            </Typography>
+          )}
 
-        {/* Second row: Buttons aligned to the right */}
-        <Stack direction="row" spacing={1} justifyContent="flex-end">
-          <Button onClick={handleClose} color="error">
-            CANCEL
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleCreateTask}
-            disabled={isCreateDisabled}
-          >
-            {currentTask ? "UPDATE" : "CREATE"}
-          </Button>
-        </Stack>
-      </DialogActions>
+          {/* Second row: Buttons aligned to the right */}
+          <Stack direction="row" spacing={1} justifyContent="flex-end">
+            <Button onClick={handleClose} color="error">
+              CANCEL
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleCreateTask}
+              disabled={isCreateDisabled}
+            >
+              {currentTask ? "UPDATE" : "CREATE"}
+            </Button>
+          </Stack>
+        </DialogActions>
+      )}
     </Dialog>
   );
 };
