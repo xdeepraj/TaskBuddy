@@ -43,6 +43,8 @@ import deleteicon from "../assets/delete-icon.svg";
 
 import TaskForm from "./TaskForm";
 
+import { Timestamp } from "firebase/firestore";
+
 import {
   DragDropContext,
   Droppable,
@@ -347,6 +349,22 @@ const ListView = () => {
         </Menu>
       </>
     );
+  };
+
+  const formatDueDate = (dueDate: Dayjs | Timestamp): string => {
+    const date = dayjs(dueDate.toDate());
+
+    if (date.isSame(dayjs(), "day")) {
+      return "Today";
+    } else if (date.isSame(dayjs().subtract(1, "day"), "day")) {
+      return "Yesterday";
+    } else if (date.isSame(dayjs().add(1, "day"), "day")) {
+      return "Tomorrow";
+    } else {
+      return isSmallScreen
+        ? date.format("DD/MM/YY")
+        : date.format("DD MMM, YYYY");
+    }
   };
 
   return (
@@ -716,10 +734,10 @@ const ListView = () => {
                               sx={{
                                 display: "grid",
                                 gridTemplateColumns: {
-                                  xs: "1fr auto",
+                                  xs: "1fr auto auto",
                                   md: "5fr 2fr 2fr 2fr 1fr",
                                 },
-                                gap: 2,
+                                gap: { xs: 0, md: 2 },
                                 padding: 1,
                                 alignItems: "center",
                                 backgroundColor: "#f1f1f1",
@@ -783,17 +801,20 @@ const ListView = () => {
                               </Box>
 
                               {/* Due Date */}
-                              {!isSmallScreen && (
-                                <Box>
-                                  <Typography variant="body1">
-                                    {task.dueDate
-                                      ? dayjs(task.dueDate.toDate()).format(
-                                          "DD MMM, YYYY"
-                                        )
-                                      : "No due date"}
-                                  </Typography>
-                                </Box>
-                              )}
+                              <Box>
+                                <Typography
+                                  variant="body1"
+                                  sx={{
+                                    fontSize: isSmallScreen
+                                      ? "0.75rem"
+                                      : "1rem",
+                                  }}
+                                >
+                                  {task.dueDate
+                                    ? formatDueDate(task.dueDate)
+                                    : "No due date"}
+                                </Typography>
+                              </Box>
 
                               {/* Task Status */}
                               {!isSmallScreen && (

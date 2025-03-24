@@ -10,7 +10,7 @@ import {
   Menu,
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import dayjs from "dayjs";
+
 import {
   DragDropContext,
   Droppable,
@@ -23,6 +23,9 @@ import deleteicon from "../assets/delete-icon.svg";
 import SearchNotFound from "../assets/SearchNotFound.svg";
 
 import { Task } from "../types/types";
+
+import { Timestamp } from "firebase/firestore";
+import dayjs, { Dayjs } from "dayjs";
 
 const BoardView = () => {
   const {
@@ -84,6 +87,20 @@ const BoardView = () => {
           status: destination.droppableId,
         });
       }
+    }
+  };
+
+  const formatDueDate = (dueDate: Dayjs | Timestamp): string => {
+    const date = dayjs(dueDate.toDate());
+
+    if (date.isSame(dayjs(), "day")) {
+      return "Today";
+    } else if (date.isSame(dayjs().subtract(1, "day"), "day")) {
+      return "Yesterday";
+    } else if (date.isSame(dayjs().add(1, "day"), "day")) {
+      return "Tomorrow";
+    } else {
+      return date.format("DD MMM, YYYY");
     }
   };
 
@@ -236,9 +253,7 @@ const BoardView = () => {
                                     color="textSecondary"
                                   >
                                     {task.dueDate
-                                      ? dayjs(task.dueDate.toDate()).format(
-                                          "DD MMM, YYYY"
-                                        )
+                                      ? formatDueDate(task.dueDate)
                                       : "No due date"}
                                   </Typography>
                                 </Box>
