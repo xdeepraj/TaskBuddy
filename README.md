@@ -25,6 +25,21 @@ A feature-rich task management application built with React, TypeScript, and Vit
   - Bulk updates, editing, and deleting are also available on mobile.
   - Optimized date display for mobile devices.
 
+## Technologies Used
+
+- **React (UI library)**
+- **TypeScript (Static typing)**
+- **Vite (Build tool)**
+- **MUI (UI components)**
+- **Firebase (Authentication & Firestore)**
+- **Cloudinary (File uploads)**
+- **@hello-pangea/dnd (Drag & drop functionality)**
+- **react-router-dom (Routing)**
+- **dayjs (Date formatting)**
+- **Tiptap (Rich text editor)**
+- **lucide-react (Icons)**
+- **@mui/x-date-pickers (Date selection)**
+
 ## Live Demo
 
 Check out the hosted version of the application here: **[Task Manager](https://task-buddy-lime-three.vercel.app/)**
