@@ -6,10 +6,10 @@ A feature-rich task management application built with React, TypeScript, and Vit
 
 - **Google Login**: Quick and hassle-free authentication via Firebase.
 - **Task Management**: Add, edit, delete tasks individually or in bulk.
-- **Bulk Updates**: Change task status for multiple tasks at once.
-- **Multiple Views**:
+- **Bulk Updates**: Change task status & delete for multiple tasks at once.
+- **Multiple Views with drag & drop functionality**:
   - **List View**: Traditional task list.
-  - **Board View**: Kanban-style board with drag & drop functionality.
+  - **Board View**: Kanban-style board.
 - **Filters & Search**:
   - Filter tasks by category and due date.
   - Search tasks by title.
@@ -79,7 +79,10 @@ Ensure you have the following installed:
 
 ## Next Steps
 
-- **Challenges Faced & Solutions Implemented** will be added next.
-- Let me know if you'd like any modifications to the instructions.
+## Challenges Faced & Solutions Implemented
+
+- **Firebase Storage Payment Requirement**: Firebase Storage required payment information to proceed, so Cloudinary was used instead for file uploads.
+- **Drag & Drop Functionality**: Implemented using `@hello-pangea/dnd` to allow smooth movement of tasks within the board view.
+- **Bulk Updates with Logs**: Since multiple actions can occur at the same time, logs are structured to capture each change with precise timestamps, ensuring accurate tracking.
 
 🚀 Happy coding!
