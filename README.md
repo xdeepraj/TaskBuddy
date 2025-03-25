@@ -77,8 +77,6 @@ Ensure you have the following installed:
 
 5. **Open your browser and visit** `http://localhost:5173/`.
 
-## Next Steps
-
 ## Challenges Faced & Solutions Implemented
 
 - **Firebase Storage Payment Requirement**: Firebase Storage required payment information to proceed, so Cloudinary was used instead for file uploads.
