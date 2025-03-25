@@ -42,7 +42,7 @@ A feature-rich task management application built with React, TypeScript, and Vit
 
 ## Live Demo
 
-Check out the hosted version of the application here: **[Task Manager](https://task-buddy-lime-three.vercel.app/)**
+Check out the hosted version of the application here: **[TaskBuddy](https://task-buddy-lime-three.vercel.app/)**
 
 ## Getting Started
 
