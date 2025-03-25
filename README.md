@@ -94,8 +94,10 @@ Ensure you have the following installed:
 
 ## Challenges Faced & Solutions Implemented
 
-- **Firebase Storage Payment Requirement**: Firebase Storage required payment information to proceed, so Cloudinary was used instead for file uploads.
-- **Drag & Drop Functionality**: Implemented using `@hello-pangea/dnd` to allow smooth movement of tasks within the board view.
-- **Bulk Updates with Logs**: Since multiple actions can occur at the same time, logs are structured to capture each change with precise timestamps, ensuring accurate tracking.
+- **Firebase Storage Payment Requirement**: Initially, Firebase Storage was considered for file uploads, but it required payment information to proceed. To avoid this, I explored various alternatives and ultimately chose Cloudinary. Cloudinary provides a free tier with generous storage and bandwidth limits, easy integration with React, and built-in optimizations for images and other files. This made it the best choice for handling file uploads efficiently.
+
+- **Drag & Drop Functionality**: Initially, I attempted to use `react-dnd` a popular React drag-and-drop library, but it had dependency issues with React 19. After troubleshooting and testing different solutions, I decided to use `@hello-pangea/dnd`, which is actively maintained and compatible with the latest React versions. This allowed me to implement smooth drag-and-drop functionality in the board view without compatibility issues.
+
+- **Bulk Updates with Logs**: Managing bulk updates required careful implementation to ensure accurate tracking. For deleting multiple tasks, I ensured that only selected tasks were deleted and no unintended actions occurred. For status updates, I implemented logging for each individual task update, ensuring that every change was recorded. Additionally, before updating a task’s status, I checked if the new status was different from the current one to prevent unnecessary updates and redundant log entries.
 
 🚀 Happy coding!
