@@ -1,4 +1,4 @@
-# Task Manager
+# TuskBuddy (Task management application)
 
 A feature-rich task management application built with React, TypeScript, and Vite. This app integrates Firebase for authentication and Firestore for data storage, while Cloudinary is used for file uploads. The UI is designed with MUI, and the app supports both list and board views with drag-and-drop functionality.
 
